@@ -19,9 +19,9 @@ Water::Water(float x, float y, float z, color_t color) {
                     g_vertex_buffer_data[pos++]= j;
                     g_vertex_buffer_data[pos++]= 0.0f;
                     for(k=0;k<2;k++){
-                        g_vertex_buffer_data[pos++]= 50*cos(angle);
+                        g_vertex_buffer_data[pos++]= 1000*cos(angle);
                         g_vertex_buffer_data[pos++]= j;
-                        g_vertex_buffer_data[pos++]= 50*sin(angle);
+                        g_vertex_buffer_data[pos++]= 1000*sin(angle);
                         angle += theta;
                     }
                     angle-=theta;

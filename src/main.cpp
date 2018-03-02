@@ -2,9 +2,11 @@
 #include "timer.h"
 #include "boat.h"
 #include "water.h"
+#include "rock.h"
 #include "building.h"
 #include "cannon.h"
 #include "sphere.h"
+
 using namespace std;
 
 GLMatrices Matrices;
@@ -17,16 +19,27 @@ GLFWwindow *window;
 
 Boat boat1;
 Water water1;
-Building building1;
 Cannon cannon;
-Sphere box;
+Sphere ball1;
+color_t randcolor[] = {COLOR_BLACK,COLOR_RED,COLOR_GREEN, COLOR_WHITE, COLOR_CLAN,COLOR_YELLOW,COLOR_ORANGE};
+vector<Rock> rock(250);
+int i=0;
 float screen_zoom = 1, screen_center_x = 0, screen_center_y = 0;
 float camera_rotation_angle = 0;
+int flag = 0;
+glm::vec3 eye,target,up;
+
+int defView = 4;
 
 Timer t60(1.0 / 60);
 
 /* Render the scene with openGL */
 /* Edit this function according to your assignment */
+double getRandDouble(double l, double r)
+{
+    return l + (((double)rand()) / RAND_MAX) * (r - l);
+}
+
 void draw()
 {
     // clear the color and depth in the frame buffer
@@ -35,26 +48,35 @@ void draw()
     // use the loaded shader program
     // Don't change unless you know what you are doing
     glUseProgram (programID);
-
-    // Eye - Location of camera. Don't change unless you are sure!!
-   //glm::vec3 eye ( 0, 5*cos(camera_rotation_angle*M_PI/180.0f),5*sin(camera_rotation_angle*M_PI/180.0f) );
-    glm::vec3 eye ( 0, 15,20);
-    glm::vec3 target (0, 0, 0);
-    glm::vec3 up (0, 1, 0);
-
-    /* Top View*/
-    /*glm::vec3 eye ( boat1.position.x,boat1.position.y+45,boat1.position.z-2);
-    glm::vec3 target (boat1.position.x,boat1.position.y,boat1.position.z);
-    glm::vec3 up (0, 1, 0);*/
-
-    // Follow Cam View
-      /*  glm::vec3 eye ( boat1.position.x,boat1.position.y+10,boat1.position.z-10);
-        glm::vec3 target (boat1.position.x,boat1.position.y,boat1.position.z+5);
-        glm::vec3 up (0, 1, 0);*/
-/* Boat View*/
-//     glm::vec3 eye (boat1.position.x,boat1.position.y+3,boat1.position.z-2);
-  //   glm::vec3 target (boat1.position.x,boat1.position.y+2,boat1.position.z-5);
-    // glm::vec3 up (0, 1, 0);
+    switch (defView)
+    {
+    case 0:
+        eye = glm::vec3 ( boat1.position.x,boat1.position.y+10,boat1.position.z+15);
+        target = glm::vec3(boat1.position.x,boat1.position.y+5,boat1.position.z);
+        up  = glm::vec3 (0, 1, 0);
+        break;
+    case 1:
+        eye  = glm::vec3(boat1.position.x,boat1.position.y+3,boat1.position.z-2);
+        target  = glm::vec3(boat1.position.x,boat1.position.y+2,boat1.position.z-5);
+        up = glm::vec3 (0, 1, 0);
+        break;
+    case 2:/* top view*/
+        eye  = glm::vec3( boat1.position.x,boat1.position.y+45,boat1.position.z-2);
+        target = glm::vec3 (boat1.position.x,boat1.position.y,boat1.position.z);
+        up = glm::vec3 (0, -1, 0);
+        break;
+    case 3:
+        eye  = glm::vec3( -20, 50, 50 );
+        target = glm::vec3 (boat1.position.x, boat1.position.y , boat1.position.z);
+        up = glm::vec3 (0, 1, 0);
+    case 4:
+//        eye = glm::vec3( 0, 15 + int(boat1.position.y) %5 ,20 + int(boat1.position.z) % 15);
+//        target = glm::vec3(0, boat1.position.y, 0);
+//        up = glm::vec3(0, 1, 0);
+        eye = glm::vec3( 0, 15,20);
+        target = glm::vec3(0, boat1.position.y, 0);
+        up = glm::vec3(0, 1, 0);
+    }
 
     // Compute Camera matrix (view)
     Matrices.view = glm::lookAt( eye, target, up ); // Rotating Camera for 3D
@@ -73,9 +95,16 @@ void draw()
     // Scene render
     water1.draw(VP);
     boat1.draw(VP);
-    box.draw(VP);
+    //box.draw(VP);
     cannon.draw(VP,0,0,0);//boat1.position.x,boat1.position.y,boat1.position.z);
-//building1.draw(VP);
+    if(flag){
+        ball1.draw(VP);
+    }
+    for(int i=0;i<rock.size();i++)
+    {
+        rock[i].draw(VP);
+    }
+    //building1.draw(VP);
 }
 
 void tick_input(GLFWwindow *window) {
@@ -87,6 +116,13 @@ void tick_input(GLFWwindow *window) {
     int candwn= glfwGetKey(window, GLFW_KEY_D);
     int canw = glfwGetKey(window, GLFW_KEY_W);
     int cans= glfwGetKey(window, GLFW_KEY_S);
+    int jump = glfwGetKey(window, GLFW_KEY_SPACE);
+    int view = glfwGetKey(window, GLFW_KEY_V);
+
+    if(jump){
+        boat1.jump();
+        cannon.jump();
+    }
     if (left) {
         //boat1.cannon.up();
         boat1.left();
@@ -116,21 +152,29 @@ void tick_input(GLFWwindow *window) {
         boat1.down();
         cannon.down();
     }
-    if(canup){
-        cannon.move_up();
-       // boat1.cannon.up();
+    if(view)
+    {
+        defView = (defView + 1)%5;
 
-}
-    if(candwn){
-        cannon.move_dwn();
-        //boat1.cannon.down();
     }
 }
 
 void tick_elements() {
-    //boat1.tick();
-    //boat1.cannon.tick();
+    //if(flag)
+      //  ball1.tick();
+    boat1.tick();
+    cannon.tick();
     camera_rotation_angle += 1;
+    static int count = 1;
+    for(int i=0;i<rock.size();i++)
+    {
+        if(detect_collision(boat1.bounding_box(), rock[i].bounding_box()))
+        {
+            rock.erase(rock.begin() + i);
+            fprintf(stderr, "%d\n", count);
+            count += 1;
+        }
+    }
 }
 
 /* Initialize the OpenGL rendering properties */
@@ -143,7 +187,19 @@ void initGL(GLFWwindow *window, int width, int height)
     water1 = Water(0, 1, 0,COLOR_BLUE);
     boat1 = Boat(0, 4, 0);
     cannon = Cannon(0,4,0);
-    box = Sphere(0,5,3,1);
+    for(int i=0;i<rock.size();i++)
+    {
+        rock[i] = Rock(
+                    getRandDouble(-300,300),
+                    3,
+                    getRandDouble(-300,300),
+                    randcolor[rand()%7]
+                );
+    }
+    /*glm::vec3 eye (boat1.position.x, boat1.position.y + 10, boat1.position.z + 15);
+    glm::vec3 target (boat1.position.x, boat1.position.y + 5, boat1.position.z);
+    glm::vec3 up (0, 1, 0);*/
+    // rock[i] = Rock(0,5,);
 
     //building1 = Building(4,0,COLOR_GREEN);
 
@@ -203,7 +259,8 @@ int main(int argc, char **argv) {
 
 bool detect_collision(bounding_box_t a, bounding_box_t b) {
     return (abs(a.x - b.x) * 2 < (a.width + b.width)) &&
-           (abs(a.y - b.y) * 2 < (a.height + b.height));
+            (abs(a.y - b.y) * 2 < (a.height + b.height)) &&
+            (abs(a.z - b.z) * 2 < (a.length + b.length));
 }
 
 void reset_screen() {

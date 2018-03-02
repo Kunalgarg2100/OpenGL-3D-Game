@@ -5,7 +5,8 @@
 Boat::Boat(float x, float y, float z) {
     this->position = glm::vec3(x, y, z);
     this->rotation = 0;
-    speed = 1;
+    this->speed = glm::vec3(0, 0, 0);
+    this->acc = glm::vec3(0, 0, 0);
     // Our vertices. Three consecutive floats give a 3D vertex; Three consecutive vertices give a triangle.
     // A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and 12*3 vertices
     GLfloat base_vertex_buffer_data[] = {
@@ -108,9 +109,24 @@ void Boat::set_position(float x, float y, float z) {
 }
 
 void Boat::tick() {
-    this->rotation += speed;
-    // this->position.x -= speed;
-    // this->position.y -= speed;
+    this->position += this->speed;
+        this->speed += this->acc;
+        if(this->position.y < 4.1)
+        {
+            if(this->acc.y < 0)
+            {
+                this->acc.y = 0;
+                this->speed.y = 0;
+            }
+            if(this->position.y <= 4)
+            {
+                this->speed.y = 0.1;
+            }
+        }
+        if(this->position.y > 4)
+        {
+            this->acc.y = -0.1;
+        }
 }
 void Boat::right()
 {
@@ -122,9 +138,26 @@ void Boat::left()
 }
 void Boat::up()
 {
-    this->position.z += 0.5;
+    this->position.z -= 0.5;
 }
 void Boat::down()
 {
-    this->position.z -= 0.5;
+    this->position.z += 0.5;
+}
+
+void Boat::jump()
+{
+    if(this->position.y <= 4.1)
+            this->speed.y = 2;
+}
+
+bounding_box_t Boat::bounding_box() {
+    float x = this->position.x;
+    float y = this->position.y;
+    float z = this->position.z;
+    float w = 4;
+    float h = 3;
+    float l = 8;
+    bounding_box_t bbox = { x,y,z,w,h,l};
+    return bbox;
 }

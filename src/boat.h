@@ -9,7 +9,7 @@ class Boat {
 public:
     Boat() {}
     Boat(float x, float y, float z);
-    glm::vec3 position;
+    glm::vec3 position,speed,acc;
     float rotation;
     Cannon cannon;
     void draw(glm::mat4 VP);
@@ -18,11 +18,12 @@ public:
     float canx,cany,canz;
     void set_position(float x, float y, float z);
     void tick();
-    double speed;
     void left();
     void right();
     void down();
+    void jump();
     void up();
+    bounding_box_t bounding_box();
 private:
     VAO *base;
     VAO *side;

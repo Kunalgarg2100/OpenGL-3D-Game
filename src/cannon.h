@@ -8,18 +8,18 @@ class Cannon {
 public:
     Cannon() {}
     Cannon(float x, float y, float z);
-    glm::vec3 position;
+    glm::vec3 position,speed,acc;
     float rotation,height,radius,rotation_y;
     void draw(glm::mat4 VP,float x, float y, float z);
     void set_position(float x, float y, float z);
     void tick();
-    double speed;
     void left();
     void right();
     void down();
     void up();
     void move_up();
     void move_dwn();
+    void jump();
     VAO *object;
 };
 

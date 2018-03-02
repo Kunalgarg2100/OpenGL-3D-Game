@@ -5,6 +5,8 @@ Cannon::Cannon(float x, float y, float z){
     this->position = glm::vec3(x, y, z);
     this->rotation = 0;
     this->rotation_y = 0;
+    this->speed = glm::vec3(0, 0, 0);
+    this->acc = glm::vec3(0, 0, 0);
     height = 2;
     radius = 0.25;
     int p = 0;
@@ -57,6 +59,24 @@ void Cannon::set_position(float x, float y, float z) {
 }
 
 void Cannon::tick() {
+    this->position += this->speed;
+        this->speed += this->acc;
+        if(this->position.y < 4.1)
+        {
+            if(this->acc.y < 0)
+            {
+                this->acc.y = 0;
+                this->speed.y = 0;
+            }
+            if(this->position.y <= 4)
+            {
+                this->speed.y = 0.1;
+            }
+        }
+        if(this->position.y > 4)
+        {
+            this->acc.y = -0.1;
+        }
 //     this->rotation += 1;
     // this->position.x -= speed;
     // this->position.y -= speed;
@@ -71,17 +91,15 @@ void Cannon::left()
 }
 void Cannon::up()
 {
-    this->position.z += 0.5;
+    this->position.z -= 0.5;
 }
 void Cannon::down()
 {
-    this->position.z -= 0.5;
+    this->position.z += 0.5;
 }
 
-void Cannon::move_up(){
-    this->rotation_y += 0.5;
-}
-
-void Cannon::move_dwn(){
-    this->rotation_y -= 0.5;
+void Cannon::jump()
+{
+    if(this->position.y <= 4.1)
+            this->speed.y = 2;
 }

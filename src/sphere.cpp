@@ -4,7 +4,7 @@
 Sphere::Sphere(float x, float y, float z, float radius){
     this->position = glm::vec3(x, y, z);
     this->rotation = 0;
-    static GLfloat base_vertex_buffer_data[5000100];
+    static GLfloat base_vertex_buffer_data[250001];
     int i = 0, flag = 0;
     float change = 10;
     for(float alpha = 0;alpha < 181.0; alpha+=1){
