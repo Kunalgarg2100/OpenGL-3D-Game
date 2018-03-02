@@ -120,10 +120,15 @@ void change_view()
 }
 
 void tick_input(GLFWwindow *window) {
+    if (glfwGetKey(window, GLFW_KEY_C)) camera_rotation_angle += 5;
+    if (glfwGetKey(window, GLFW_KEY_Z)) camera_y += 0.05;
+    if (glfwGetKey(window, GLFW_KEY_X)) camera_y -= 0.05;
+
     int left  = glfwGetKey(window, GLFW_KEY_LEFT);
     int right = glfwGetKey(window, GLFW_KEY_RIGHT);
     int up = glfwGetKey(window, GLFW_KEY_UP);
     int down = glfwGetKey(window, GLFW_KEY_DOWN);
+
     int jump = glfwGetKey(window, GLFW_KEY_SPACE);
 
     if(jump){
@@ -132,14 +137,14 @@ void tick_input(GLFWwindow *window) {
     }
 
     if (left) {
-        boat1.rotation += 0.5;
-        cannon.rotation += 0.5;
+        boat1.left();
+        cannon.left();
     }
 
     if(right)
     {
-        boat1.rotation -= 0.5;
-        cannon.rotation -= 0.5;
+        boat1.right();
+        cannon.right();
     }
     if(up) {
         //boat1.
@@ -151,11 +156,25 @@ void tick_input(GLFWwindow *window) {
         boat1.backward();
         cannon.backward();
     }
+
+    int width, height;
+    glfwGetWindowSize(window, &width, &height);
+    double xpos, ypos;
+    glfwGetCursorPos(window, &xpos, &ypos);
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+        camera_look_x -= -360 + (xpos - prev_xpos) * 90 / width;
+        camera_look_y -= -360 + (ypos - prev_ypos) * 90 / height;
+        camera_look_x = camera_look_x > 360 ? camera_look_x - ((int) (camera_look_x / 360))*360 : camera_look_x;
+        camera_look_y = camera_look_y > 360 ? camera_look_y - ((int) (camera_look_y / 360))*360 : camera_look_y;
+        prev_xpos = xpos;
+        prev_ypos = ypos;
+    }
 }
 
 void tick_elements() {
     boat1.tick();
     cannon.tick();
+    //boat1.sail.rotation+=6;
     for (int i=0;i<cnt+1;i++)
     {
         fireball[i].tick();

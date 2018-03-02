@@ -1,6 +1,6 @@
 #include "boat.h"
 #include "main.h"
-//#include "cannon.h"
+#include "sail.h"
 
 Boat::Boat(float x, float y, float z) {
     this->position = glm::vec3(x, y, z);
@@ -79,18 +79,11 @@ Boat::Boat(float x, float y, float z) {
         }
     };
 
-    GLfloat flag_vertex_buffer_data[] = {
-        -1.0f, 4.0f, 1.0f,
-        1.0f, 4.0f, 1.0f,
-        -1.0f, 4.0f, -1.0f,
-    };
-
     this->base = create3DObject(GL_TRIANGLES, 2 * 3, base_vertex_buffer_data, COLOR_BLACK);
     this->side = create3DObject(GL_TRIANGLES, 4 * 3, side_vertex_buffer_data,COLOR_RED);
     this->face = create3DObject(GL_TRIANGLES, 6 * 3, face_vertex_buffer_data,COLOR_GREEN);
     this->pole = create3DObject(GL_TRIANGLES, 2400, pole_vertex_buffer_data,COLOR_BACKGROUND, GL_FILL);
-    this->flag = create3DObject(GL_TRIANGLES, 3, flag_vertex_buffer_data,COLOR_GREEN);
-
+    sail = Sail(x,y,z);
 }
 
 void Boat::draw(glm::mat4 VP) {
@@ -106,7 +99,8 @@ void Boat::draw(glm::mat4 VP) {
     draw3DObject(this->side);
     draw3DObject(this->face);
     draw3DObject(this->pole);
-    draw3DObject(this->flag);
+    //draw3DObject(this->sail.flag);
+    sail.draw(VP);
     //draw3DObject(this->cannon.object);
     //cannon.draw(cannon);
 
@@ -149,17 +143,20 @@ void Boat::tick() {
     {
         this->speed.y -= 0.5;
     }
+    sail.tick();
 }
 
 void Boat::jump()
 {
     if(this->position.y <= 4.1)
         this->speed.y = 4;
+    sail.jump();
 }
 
 void Boat::forward()
 {
     this->speed = glm::vec3(-0.5*sin(this->rotation*PI/180.0),0,-0.5*cos(this->rotation*PI/180.0));
+    sail.forward();
     /*this->position.z -= 0.5*cos(this->rotation*PI/180.0);
     this->position.x -= 0.5*sin(this->rotation*PI/180.0);*/
 }
@@ -167,8 +164,21 @@ void Boat::forward()
 void Boat::backward()
 {
     this->speed = glm::vec3(0.5*sin(this->rotation*PI/180.0),0,0.5*cos(this->rotation*PI/180.0));
+    sail.backward();
     /*this->position.z += 0.5*cos(this->rotation*PI/180.0);
     this->position.x += 0.5*sin(this->rotation*PI/180.0);*/
+}
+
+void Boat::left()
+{
+    this->rotation += 0.5;
+    sail.left();
+}
+
+void Boat::right()
+{
+    this->rotation -= 0.5;
+    sail.right();
 }
 
 bounding_box_t Boat::bounding_box() {

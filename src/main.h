@@ -78,6 +78,7 @@ void fire_fireball();
 void change_view();
 extern double camera_rotation_angle, camera_y, camera_zoom,camera_look_x, camera_look_y;
 extern float screen_zoom, screen_center_x, screen_center_y;
+extern int prev_xpos, prev_ypos;
 void reset_screen();
 
 // ---- Colors ----

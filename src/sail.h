@@ -1,17 +1,15 @@
 #include "main.h"
-#include "sail.h"
 
-#ifndef BOAT_H
-#define BOAT_H
+#ifndef Sail_H
+#define Sail_H
 
 
-class Boat {
+class Sail {
 public:
-    Boat() {}
-    Boat(float x, float y, float z);
+    Sail() {}
+    Sail(float x, float y, float z);
     glm::vec3 position,speed,acc;
     float rotation;
-    Sail sail;
     void draw(glm::mat4 VP);
     float height;
     float radius;
@@ -25,13 +23,7 @@ public:
     void forward();
     void backward();
     void up();
-    void add_sail(float x, float y, float z);
-    bounding_box_t bounding_box();
-private:
-    VAO *base;
-    VAO *side;
-    VAO *face;
-    VAO *pole;
+    VAO *flag;
 };
 
-#endif // BOAT_H
+#endif // SAIL_H
