@@ -49,7 +49,7 @@ Boat::Boat(float x, float y, float z) {
         -1.0f, -1.0f,-2.0f,
         1.0f, -1.0f,-2.0f,
 
-         -2.0f, 1.0f, 3.0f,
+        -2.0f, 1.0f, 3.0f,
         -1.0f,-1.0f, 2.0f,
         0.0f, 2.0f, 4.0f,
 
@@ -66,23 +66,23 @@ Boat::Boat(float x, float y, float z) {
     const double PI = 4 * atan(1);
     int ptr=0;
     GLfloat pole_vertex_buffer_data[7200];
-        for(int i=0;i<800;i++){
-            double angle = i * PI/400;
-            for(int j=0;j<3;j++)
-                pole_vertex_buffer_data[ptr++]=0.0f;
-            for(int j=0;j<2;j++)
-            {
-                pole_vertex_buffer_data[ptr++]=0.2*cos(angle);
-                pole_vertex_buffer_data[ptr++]=4.0f;
-                pole_vertex_buffer_data[ptr++]=0.5f*sin(angle);
-                angle = (i+1) * PI/400;
-            }
-        };
+    for(int i=0;i<800;i++){
+        double angle = i * PI/400;
+        for(int j=0;j<3;j++)
+            pole_vertex_buffer_data[ptr++]=0.0f;
+        for(int j=0;j<2;j++)
+        {
+            pole_vertex_buffer_data[ptr++]=0.2*cos(angle);
+            pole_vertex_buffer_data[ptr++]=4.0f;
+            pole_vertex_buffer_data[ptr++]=0.5f*sin(angle);
+            angle = (i+1) * PI/400;
+        }
+    };
 
     GLfloat flag_vertex_buffer_data[] = {
-            -1.0f, 4.0f, 1.0f,
-            1.0f, 4.0f, 1.0f,
-            -1.0f, 4.0f, -1.0f,
+        -1.0f, 4.0f, 1.0f,
+        1.0f, 4.0f, 1.0f,
+        -1.0f, 4.0f, -1.0f,
     };
 
     this->base = create3DObject(GL_TRIANGLES, 2 * 3, base_vertex_buffer_data, COLOR_BLACK);
@@ -118,43 +118,57 @@ void Boat::set_position(float x, float y, float z) {
 
 void Boat::tick() {
     this->position += this->speed;
-        this->speed += this->acc;
-        if(this->position.y < 4.1)
-        {
-            if(this->acc.y < 0)
-            {
-                this->acc.y = 0;
-                this->speed.y = 0;
-            }
-            if(this->position.y <= 4)
-            {
-                this->speed.y = 0.1;
-            }
-        }
-        if(this->position.y > 4)
-        {
-            this->acc.y = -0.1;
-        }
+    //this->speed += this->acc;
+    if(this->speed.x > 0.5)
+        this->speed.x -= 0.5;
+    else if(this->speed.x < -0.5)
+        this->speed.x += 0.5;
+    else
+        this->speed.x = 0;
+    if(this->speed.z > 0.5)
+        this->speed.z -= 0.5;
+    else if(this->speed.z < -0.5)
+        this->speed.z += 0.5;
+    else
+        this->speed.z = 0;
+    if(this->speed.y > 0.5)
+        this->speed.y -= 0.5;
+    else if(this->speed.y < -0.5)
+        this->speed.y += 0.5;
+    else
+        this->speed.y = 0;
+    if(this->position.y < 4.1)
+    {
+       this->speed.y = 0;
+        if(this->position.y <= 4)
+      {
+           this->position.y = 4;
+       }
+    }
+    if(this->position.y > 4 && this->speed.y == 0)
+    {
+        this->speed.y -= 0.5;
+    }
 }
 
 void Boat::jump()
 {
     if(this->position.y <= 4.1)
-            this->speed.y = 2;
+        this->speed.y = 4;
 }
 
 void Boat::forward()
 {
-    //this->speed = glm::vec3(-0.5*sin(this->rotation*PI/180.0),0,-0.5*cos(this->rotation*PI/180.0))
-    this->position.z -= 0.5*cos(this->rotation*PI/180.0);
-    this->position.x -= 0.5*sin(this->rotation*PI/180.0);
+    this->speed = glm::vec3(-0.5*sin(this->rotation*PI/180.0),0,-0.5*cos(this->rotation*PI/180.0));
+    /*this->position.z -= 0.5*cos(this->rotation*PI/180.0);
+    this->position.x -= 0.5*sin(this->rotation*PI/180.0);*/
 }
+
 void Boat::backward()
 {
-    //this->speed = glm::vec3(0.5*sin(this->rotation*PI/180.0),0,0.5*cos(this->rotation*PI/180.0))
-
-    this->position.z += 0.5*cos(this->rotation*PI/180.0);
-    this->position.x += 0.5*sin(this->rotation*PI/180.0);
+    this->speed = glm::vec3(0.5*sin(this->rotation*PI/180.0),0,0.5*cos(this->rotation*PI/180.0));
+    /*this->position.z += 0.5*cos(this->rotation*PI/180.0);
+    this->position.x += 0.5*sin(this->rotation*PI/180.0);*/
 }
 
 bounding_box_t Boat::bounding_box() {

@@ -21,16 +21,16 @@ Boat boat1;
 Water water1;
 Cannon cannon;
 vector<Sphere> fireball(100);
+double camera_rotation_angle = -170, camera_y = 8, camera_zoom = 0, camera_look_x = -170, camera_look_y = 60;
 color_t randcolor[] = {COLOR_BLACK,COLOR_RED,COLOR_GREEN, COLOR_WHITE, COLOR_CLAN,COLOR_YELLOW,COLOR_ORANGE};
 vector<Rock> rock(250);
 int i=0;
 int cnt=0;
 float screen_zoom = 1, screen_center_x = 0, screen_center_y = 0;
-float camera_rotation_angle = 0;
 int flag = 0;
 glm::vec3 eye,target,up;
 
-int defView = 1;
+int defView = 3;
 
 Timer t60(1.0 / 60);
 
@@ -51,30 +51,27 @@ void draw()
     glUseProgram (programID);
     switch (defView)
     {
-    case 0:
-        eye = glm::vec3 ( boat1.position.x,boat1.position.y+10,boat1.position.z+15);
+    case 0:/* cam follow view*/
+        eye = glm::vec3 (boat1.position.x,boat1.position.y+10,boat1.position.z+15);
         target = glm::vec3(boat1.position.x,boat1.position.y+5,boat1.position.z);
         up  = glm::vec3 (0, 1, 0);
         break;
-    case 1:
+    case 1:/* driver view*/
         eye  = glm::vec3(boat1.position.x ,boat1.position.y+3,boat1.position.z-2*cos((cannon.rotation)* PI / 180.0));
         target  = glm::vec3(boat1.position.x - 4*sin(cannon.rotation* PI / 180.0),boat1.position.y+2,boat1.position.z-6*cos((cannon.rotation)* PI / 180.0));
         up = glm::vec3 (0, 1, 0);
         break;
     case 2:/* top view*/
-        eye  = glm::vec3( boat1.position.x,boat1.position.y+45,boat1.position.z-2);
+        eye  = glm::vec3(boat1.position.x, boat1.position.y+45, boat1.position.z-2);
         target = glm::vec3 (boat1.position.x,boat1.position.y,boat1.position.z);
         up = glm::vec3 (0, -1, 0);
         break;
     case 3:
         eye  = glm::vec3( -20, 50, 50 );
-        target = glm::vec3 (boat1.position.x, boat1.position.y , boat1.position.z);
+        target = glm::vec3 (0,0,0);//boat1.position.x, boat1.position.y , boat1.position.z);
         up = glm::vec3 (0, 1, 0);
     case 4:
-        //        eye = glm::vec3( 0, 15 + int(boat1.position.y) %5 ,20 + int(boat1.position.z) % 15);
-        //        target = glm::vec3(0, boat1.position.y, 0);
-        //        up = glm::vec3(0, 1, 0);
-        eye = glm::vec3( 0, 15,20  + int(abs(boat1.position.z)) % 15);
+        eye = glm::vec3( 0, 15,20);
         target = glm::vec3(0, boat1.position.y, 0);
         up = glm::vec3(0, 1, 0);
     }
@@ -157,8 +154,6 @@ void tick_input(GLFWwindow *window) {
 }
 
 void tick_elements() {
-    //if(flag)
-    //  ball1.tick();
     boat1.tick();
     cannon.tick();
     for (int i=0;i<cnt+1;i++)

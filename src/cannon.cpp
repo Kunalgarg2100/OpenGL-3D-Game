@@ -60,41 +60,54 @@ void Cannon::set_position(float x, float y, float z) {
 
 void Cannon::tick() {
     this->position += this->speed;
-        this->speed += this->acc;
-        if(this->position.y < 4.1)
-        {
-            if(this->acc.y < 0)
-            {
-                this->acc.y = 0;
-                this->speed.y = 0;
-            }
-            if(this->position.y <= 4)
-            {
-                this->speed.y = 0.1;
-            }
-        }
-        if(this->position.y > 4)
-        {
-            this->acc.y = -0.1;
-        }
-//     this->rotation += 1;
-    // this->position.x -= speed;
-    // this->position.y -= speed;
+    //this->speed += this->acc;
+    if(this->speed.x > 0.5)
+        this->speed.x -= 0.5;
+    else if(this->speed.x < -0.5)
+        this->speed.x += 0.5;
+    else
+        this->speed.x = 0;
+    if(this->speed.z > 0.5)
+        this->speed.z -= 0.5;
+    else if(this->speed.z < -0.5)
+        this->speed.z += 0.5;
+    else
+        this->speed.z = 0;
+    if(this->speed.y > 0.5)
+        this->speed.y -= 0.5;
+    else if(this->speed.y < -0.5)
+        this->speed.y += 0.5;
+    else
+        this->speed.y = 0;
+    if(this->position.y < 4.1)
+    {
+       this->speed.y = 0;
+        if(this->position.y <= 4)
+      {
+           this->position.y = 4;
+       }
+    }
+    if(this->position.y > 4 && this->speed.y == 0)
+    {
+        this->speed.y -= 0.5;
+    }
 }
 
 void Cannon::jump()
 {
     if(this->position.y <= 4.1)
-            this->speed.y = 2;
+            this->speed.y = 4;
 }
 
 void Cannon::forward()
 {
-    this->position.z -= 0.5*cos(this->rotation*PI/180.0);
-    this->position.x -= 0.5*sin(this->rotation*PI/180.0);
+    this->speed = glm::vec3(-0.5*sin(this->rotation*PI/180.0),0,-0.5*cos(this->rotation*PI/180.0));
+    /*this->position.z -= 0.5*cos(this->rotation*PI/180.0);
+    this->position.x -= 0.5*sin(this->rotation*PI/180.0);*/
 }
 void Cannon::backward()
 {
-    this->position.z += 0.5*cos(this->rotation*PI/180.0);
-    this->position.x += 0.5*sin(this->rotation*PI/180.0);
+    this->speed = glm::vec3(0.5*sin(this->rotation*PI/180.0),0,0.5*cos(this->rotation*PI/180.0));
+    /*this->position.z += 0.5*cos(this->rotation*PI/180.0);
+    this->position.x += 0.5*sin(this->rotation*PI/180.0);*/
 }
