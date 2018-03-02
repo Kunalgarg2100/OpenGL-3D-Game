@@ -30,7 +30,7 @@ float camera_rotation_angle = 0;
 int flag = 0;
 glm::vec3 eye,target,up;
 
-int defView = 0;
+int defView = 1;
 
 Timer t60(1.0 / 60);
 
@@ -57,8 +57,8 @@ void draw()
         up  = glm::vec3 (0, 1, 0);
         break;
     case 1:
-        eye  = glm::vec3(boat1.position.x,boat1.position.y+3,boat1.position.z-2);
-        target  = glm::vec3(boat1.position.x,boat1.position.y+2,boat1.position.z-5);
+        eye  = glm::vec3(boat1.position.x ,boat1.position.y+3,boat1.position.z-2*cos((cannon.rotation)* PI / 180.0));
+        target  = glm::vec3(boat1.position.x - 4*sin(cannon.rotation* PI / 180.0),boat1.position.y+2,boat1.position.z-6*cos((cannon.rotation)* PI / 180.0));
         up = glm::vec3 (0, 1, 0);
         break;
     case 2:/* top view*/

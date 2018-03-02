@@ -81,22 +81,6 @@ void Cannon::tick() {
     // this->position.x -= speed;
     // this->position.y -= speed;
 }
-void Cannon::right()
-{
-    this->position.x += 0.5;
-}
-void Cannon::left()
-{
-    this->position.x -= 0.5;
-}
-void Cannon::up()
-{
-    this->position.z -= 0.5;
-}
-void Cannon::down()
-{
-    this->position.z += 0.5;
-}
 
 void Cannon::jump()
 {
