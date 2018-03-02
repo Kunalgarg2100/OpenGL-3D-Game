@@ -65,24 +65,32 @@ Boat::Boat(float x, float y, float z) {
 
     const double PI = 4 * atan(1);
     int ptr=0;
-    GLfloat flag_vertex_buffer_data[7200];
+    GLfloat pole_vertex_buffer_data[7200];
         for(int i=0;i<800;i++){
             double angle = i * PI/400;
             for(int j=0;j<3;j++)
-                flag_vertex_buffer_data[ptr++]=0.0f;
+                pole_vertex_buffer_data[ptr++]=0.0f;
             for(int j=0;j<2;j++)
             {
-                flag_vertex_buffer_data[ptr++]=0.2*cos(angle);
-                flag_vertex_buffer_data[ptr++]=4.0f;
-                flag_vertex_buffer_data[ptr++]=0.5f*sin(angle);
+                pole_vertex_buffer_data[ptr++]=0.2*cos(angle);
+                pole_vertex_buffer_data[ptr++]=4.0f;
+                pole_vertex_buffer_data[ptr++]=0.5f*sin(angle);
                 angle = (i+1) * PI/400;
             }
         };
+
+    GLfloat flag_vertex_buffer_data[] = {
+            -1.0f, 4.0f, 1.0f,
+            1.0f, 4.0f, 1.0f,
+            -1.0f, 4.0f, -1.0f,
+    };
+
     //this->cannon = Cannon(x,y,z);
     this->base = create3DObject(GL_TRIANGLES, 2 * 3, base_vertex_buffer_data, COLOR_BLACK);
     this->side = create3DObject(GL_TRIANGLES, 4 * 3, side_vertex_buffer_data,COLOR_RED);
     this->face = create3DObject(GL_TRIANGLES, 6 * 3, face_vertex_buffer_data,COLOR_GREEN);
-    this->flag = create3DObject(GL_TRIANGLES, 2400, flag_vertex_buffer_data,COLOR_BACKGROUND, GL_FILL);
+    this->pole = create3DObject(GL_TRIANGLES, 2400, pole_vertex_buffer_data,COLOR_BACKGROUND, GL_FILL);
+    this->flag = create3DObject(GL_TRIANGLES, 3, flag_vertex_buffer_data,COLOR_GREEN);
 
 }
 
@@ -98,6 +106,7 @@ void Boat::draw(glm::mat4 VP) {
     draw3DObject(this->base);
     draw3DObject(this->side);
     draw3DObject(this->face);
+    draw3DObject(this->pole);
     draw3DObject(this->flag);
     //draw3DObject(this->cannon.object);
     //cannon.draw(cannon);
@@ -150,6 +159,32 @@ void Boat::jump()
     if(this->position.y <= 4.1)
             this->speed.y = 2;
 }
+
+void Boat::forward()
+{
+    this->position.z -= 0.5*cos(this->rotation*PI/180.0);
+    this->position.x -= 0.5*sin(this->rotation*PI/180.0);
+}
+void Boat::backward()
+{
+    this->position.z += 0.5*cos(this->rotation*PI/180.0);
+    this->position.x += 0.5*sin(this->rotation*PI/180.0);
+}
+
+/*glm::vec3 Boat::release_fireball()
+{
+    if(this->is_fireball_present && fireball.position.z > -1.0){
+        return glm::vec3(0, 0, 0);
+    }
+    glm::vec3 pos = this->cannon.get_extreme();
+    this->fireball = Sphere(pos.x, pos.y, pos.z, 1.0);
+    float s_x = FIRE_BALL_SPEED*sin(this->rotation*PI/180.0) + this->speed.x;
+    float s_y = FIRE_BALL_SPEED*cos(this->rotation*PI/180.0) + this->speed.y;
+    float s_z = 0.2 + std::min(this->speed.z, (float)0.4);
+    this->fireball.set_speed(s_x, s_y, s_z);
+    this->is_fireball_present = 1;
+    return pos;
+}*/
 
 bounding_box_t Boat::bounding_box() {
     float x = this->position.x;

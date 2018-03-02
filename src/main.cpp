@@ -20,16 +20,17 @@ GLFWwindow *window;
 Boat boat1;
 Water water1;
 Cannon cannon;
-Sphere ball1;
+vector<Sphere> fireball(100);
 color_t randcolor[] = {COLOR_BLACK,COLOR_RED,COLOR_GREEN, COLOR_WHITE, COLOR_CLAN,COLOR_YELLOW,COLOR_ORANGE};
 vector<Rock> rock(250);
 int i=0;
+int cnt=0;
 float screen_zoom = 1, screen_center_x = 0, screen_center_y = 0;
 float camera_rotation_angle = 0;
 int flag = 0;
 glm::vec3 eye,target,up;
 
-int defView = 4;
+int defView = 0;
 
 Timer t60(1.0 / 60);
 
@@ -70,10 +71,10 @@ void draw()
         target = glm::vec3 (boat1.position.x, boat1.position.y , boat1.position.z);
         up = glm::vec3 (0, 1, 0);
     case 4:
-//        eye = glm::vec3( 0, 15 + int(boat1.position.y) %5 ,20 + int(boat1.position.z) % 15);
-//        target = glm::vec3(0, boat1.position.y, 0);
-//        up = glm::vec3(0, 1, 0);
-        eye = glm::vec3( 0, 15,20);
+        //        eye = glm::vec3( 0, 15 + int(boat1.position.y) %5 ,20 + int(boat1.position.z) % 15);
+        //        target = glm::vec3(0, boat1.position.y, 0);
+        //        up = glm::vec3(0, 1, 0);
+        eye = glm::vec3( 0, 15,20  + int(abs(boat1.position.z)) % 15);
         target = glm::vec3(0, boat1.position.y, 0);
         up = glm::vec3(0, 1, 0);
     }
@@ -97,14 +98,28 @@ void draw()
     boat1.draw(VP);
     //box.draw(VP);
     cannon.draw(VP,0,0,0);//boat1.position.x,boat1.position.y,boat1.position.z);
-    if(flag){
-        ball1.draw(VP);
-    }
     for(int i=0;i<rock.size();i++)
     {
         rock[i].draw(VP);
     }
+    for (int i=0;i<fireball.size();i++)
+    {
+        fireball[i].draw(VP);
+    }
     //building1.draw(VP);
+}
+
+void fire_fireball()
+{
+    fireball[cnt].position = glm::vec3 (cannon.position.x- 6*sin(cannon.rotation* PI / 180.0),cannon.position.y+2,cannon.position.z + 6*cos((cannon.rotation+180)* PI / 180.0));//cannon.position.x, cannon.position.y , cannon.position.z);
+    fprintf(stderr,"fire,%f %f %f\n",fireball[cnt].position.x,fireball[cnt].position.y,fireball[cnt].position.z);
+    fireball[cnt].speed = glm::vec3(-0.5*sin(cannon.rotation*PI/180.0),0.4,-0.5*cos(cannon.rotation*PI/180.0));
+    cnt++;
+}
+
+void change_view()
+{
+    defView = (defView + 1)%5;
 }
 
 void tick_input(GLFWwindow *window) {
@@ -112,58 +127,44 @@ void tick_input(GLFWwindow *window) {
     int right = glfwGetKey(window, GLFW_KEY_RIGHT);
     int up = glfwGetKey(window, GLFW_KEY_UP);
     int down = glfwGetKey(window, GLFW_KEY_DOWN);
-    int canup = glfwGetKey(window, GLFW_KEY_A);
-    int candwn= glfwGetKey(window, GLFW_KEY_D);
-    int canw = glfwGetKey(window, GLFW_KEY_W);
-    int cans= glfwGetKey(window, GLFW_KEY_S);
     int jump = glfwGetKey(window, GLFW_KEY_SPACE);
-    int view = glfwGetKey(window, GLFW_KEY_V);
 
     if(jump){
         boat1.jump();
         cannon.jump();
     }
+
     if (left) {
-        //boat1.cannon.up();
-        boat1.left();
-        cannon.left();
-        // Do something
-    }
-    if (cans){
         boat1.rotation += 0.5;
         cannon.rotation += 0.5;
     }
-    if(canw){
+
+    if(right)
+    {
         boat1.rotation -= 0.5;
         cannon.rotation -= 0.5;
     }
-    if(right)
-    {
-        boat1.right();
-        cannon.right();
-    }
     if(up) {
         //boat1.
-        boat1.up();
-        cannon.up();
+        boat1.forward();
+        cannon.forward();
     }
     if(down) {
         //boat1.cannon.down();
-        boat1.down();
-        cannon.down();
-    }
-    if(view)
-    {
-        defView = (defView + 1)%5;
-
+        boat1.backward();
+        cannon.backward();
     }
 }
 
 void tick_elements() {
     //if(flag)
-      //  ball1.tick();
+    //  ball1.tick();
     boat1.tick();
     cannon.tick();
+    for (int i=0;i<cnt+1;i++)
+    {
+        fireball[i].tick();
+    }
     camera_rotation_angle += 1;
     static int count = 1;
     for(int i=0;i<rock.size();i++)
@@ -195,6 +196,10 @@ void initGL(GLFWwindow *window, int width, int height)
                     getRandDouble(-300,300),
                     randcolor[rand()%7]
                 );
+    }
+    for(int i=0;i<fireball.size();i++)
+    {
+        fireball[i] = Sphere(-1000,-1000,-1000,0.5);
     }
     /*glm::vec3 eye (boat1.position.x, boat1.position.y + 10, boat1.position.z + 15);
     glm::vec3 target (boat1.position.x, boat1.position.y + 5, boat1.position.z);

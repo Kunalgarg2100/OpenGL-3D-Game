@@ -25,8 +25,13 @@ void keyboard(GLFWwindow *window, int key, int scancode, int action, int mods) {
     // Function is called first on GLFW_PRESS.
 
     if (action == GLFW_RELEASE) {
-        // switch (key) {
-        // case GLFW_KEY_C:
+         switch (key) {
+         case GLFW_KEY_F:
+             fire_fireball();
+             break;
+         case GLFW_KEY_V:
+             change_view();
+             break;
         // rectangle_rot_status = !rectangle_rot_status;
         // break;
         // case GLFW_KEY_P:
@@ -38,7 +43,9 @@ void keyboard(GLFWwindow *window, int key, int scancode, int action, int mods) {
         // default:
         // break;
         // }
-    } else if (action == GLFW_PRESS) {
+    }
+    }
+    else if (action == GLFW_PRESS) {
         switch (key) {
         case GLFW_KEY_ESCAPE:
             quit(window);

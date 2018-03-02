@@ -103,3 +103,14 @@ void Cannon::jump()
     if(this->position.y <= 4.1)
             this->speed.y = 2;
 }
+
+void Cannon::forward()
+{
+    this->position.z -= 0.5*cos(this->rotation*PI/180.0);
+    this->position.x -= 0.5*sin(this->rotation*PI/180.0);
+}
+void Cannon::backward()
+{
+    this->position.z += 0.5*cos(this->rotation*PI/180.0);
+    this->position.x += 0.5*sin(this->rotation*PI/180.0);
+}

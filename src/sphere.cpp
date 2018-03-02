@@ -8,31 +8,31 @@ Sphere::Sphere(float x, float y, float z, float radius){
     int i = 0, flag = 0;
     float change = 10;
     for(float alpha = 0;alpha < 181.0; alpha+=1){
-        this->end1 = glm::vec3(x /*+ radius*sin(alpha * PI / 180.0)*/, y + radius*cos(alpha * PI / 180.0), z);
-        this->end2 = glm::vec3(x /*+ radius*sin((alpha+1)*PI/180.0)*/, y + radius*cos((alpha+1)*PI/180.0), z);
+        this->end1 = glm::vec3(x , radius*cos(alpha * PI / 180.0), z);
+        this->end2 = glm::vec3(x , radius*cos((alpha+1)*PI/180.0), z);
 
         float c_radius = radius * sin(alpha * PI / 180.0);
         float d_radius = radius * sin((alpha+1) * PI / 180.0);
 
         flag = 0;
         for(float theta = 0;theta < 361.0; theta += change, flag++){
-            base_vertex_buffer_data[i++] = end1.x - c_radius*cos(theta * PI / 180.0);
+            base_vertex_buffer_data[i++] = c_radius*cos(theta * PI / 180.0);
             base_vertex_buffer_data[i++] = end1.y;
-            base_vertex_buffer_data[i++] = end1.z - c_radius*sin(theta * PI / 180.0);
+            base_vertex_buffer_data[i++] = c_radius*sin(theta * PI / 180.0);
 
-            base_vertex_buffer_data[i++] = end2.x - d_radius*cos(theta * PI / 180.0);
+            base_vertex_buffer_data[i++] = d_radius*cos(theta * PI / 180.0);
             base_vertex_buffer_data[i++] = end2.y;
-            base_vertex_buffer_data[i++] = end2.z - d_radius*sin(theta * PI / 180.0);
+            base_vertex_buffer_data[i++] = d_radius*sin(theta * PI / 180.0);
 
             if(flag % 2 == 0){
-                base_vertex_buffer_data[i++] = end2.x - d_radius*cos((theta + change) * PI / 180.0);
+                base_vertex_buffer_data[i++] = d_radius*cos((theta + change) * PI / 180.0);
                 base_vertex_buffer_data[i++] = end2.y;
-                base_vertex_buffer_data[i++] = end2.z - d_radius*sin((theta + change) * PI / 180.0);
+                base_vertex_buffer_data[i++] = d_radius*sin((theta + change) * PI / 180.0);
             }
             else{
-                base_vertex_buffer_data[i++] = end1.x - c_radius*cos((theta - change) * PI / 180.0);
+                base_vertex_buffer_data[i++] = c_radius*cos((theta - change) * PI / 180.0);
                 base_vertex_buffer_data[i++] = end1.y;
-                base_vertex_buffer_data[i++] = end1.z - c_radius*sin((theta - change) * PI / 180.0);
+                base_vertex_buffer_data[i++] = c_radius*sin((theta - change) * PI / 180.0);
                 theta -= change;
             }
         }
@@ -57,11 +57,6 @@ void Sphere::set_position(float x, float y, float z) {
     this->position = glm::vec3(x, y, z);
 }
 
-void Sphere::tick() {
-    // this->rotation += speed;
-    // this->position.x -= speed;
-    // this->position.y -= speed;
-}
 void Sphere::right()
 {
     this->position.x += 0.5;
@@ -77,4 +72,28 @@ void Sphere::up()
 void Sphere::down()
 {
     this->position.z -= 0.5;
+}
+
+void Sphere::tick() {
+    this->position += this->speed;
+    this->decelarate();
+}
+
+void Sphere::decelarate(){
+    if(this->speed.y > -0.7){
+        this->speed.y -= 0.01;
+    }
+    /* Setting limits for speed in x and y direction */
+    if(this->speed.x > 0.005)
+        this->speed.x -= 0.005;
+    else if(this->speed.x < -0.005)
+        this->speed.x += 0.005;
+    else
+        this->speed.x = 0;
+    if(this->speed.z > 0.005)
+        this->speed.z -= 0.005;
+    else if(this->speed.z < -0.005)
+        this->speed.z += 0.005;
+    else
+        this->speed.z = 0;
 }

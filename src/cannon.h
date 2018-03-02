@@ -19,6 +19,8 @@ public:
     void up();
     void move_up();
     void move_dwn();
+    void forward();
+    void backward();
     void jump();
     VAO *object;
 };

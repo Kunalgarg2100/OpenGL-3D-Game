@@ -22,12 +22,15 @@ public:
     void right();
     void down();
     void jump();
+    void forward();
+    void backward();
     void up();
     bounding_box_t bounding_box();
 private:
     VAO *base;
     VAO *side;
     VAO *face;
+    VAO *pole;
     VAO *flag;
 };
 

@@ -74,7 +74,8 @@ struct bounding_box_t {
 };
 
 bool detect_collision(bounding_box_t a, bounding_box_t b);
-
+void fire_fireball();
+void change_view();
 extern float screen_zoom, screen_center_x, screen_center_y;
 void reset_screen();
 
@@ -93,4 +94,5 @@ extern const color_t COLOR_ORANGE;
 extern const color_t COLOR_CLAN;
 extern const color_t COLOR_GREY;
 const double PI = 4 * atan(1);
+
 #endif
