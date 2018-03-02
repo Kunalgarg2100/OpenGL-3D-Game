@@ -73,7 +73,7 @@ Boat::Boat(float x, float y, float z) {
         for(int j=0;j<2;j++)
         {
             pole_vertex_buffer_data[ptr++]=0.2*cos(angle);
-            pole_vertex_buffer_data[ptr++]=4.0f;
+            pole_vertex_buffer_data[ptr++]=5.0f;
             pole_vertex_buffer_data[ptr++]=0.5f*sin(angle);
             angle = (i+1) * PI/400;
         }
@@ -156,7 +156,7 @@ void Boat::jump()
 void Boat::forward()
 {
     this->speed = glm::vec3(-0.5*sin(this->rotation*PI/180.0),0,-0.5*cos(this->rotation*PI/180.0));
-    sail.forward();
+    sail.forward(this->rotation);
     /*this->position.z -= 0.5*cos(this->rotation*PI/180.0);
     this->position.x -= 0.5*sin(this->rotation*PI/180.0);*/
 }
@@ -164,7 +164,7 @@ void Boat::forward()
 void Boat::backward()
 {
     this->speed = glm::vec3(0.5*sin(this->rotation*PI/180.0),0,0.5*cos(this->rotation*PI/180.0));
-    sail.backward();
+    sail.backward(this->rotation);
     /*this->position.z += 0.5*cos(this->rotation*PI/180.0);
     this->position.x += 0.5*sin(this->rotation*PI/180.0);*/
 }
@@ -172,13 +172,13 @@ void Boat::backward()
 void Boat::left()
 {
     this->rotation += 0.5;
-    sail.left();
+    sail.left(this->rotation);
 }
 
 void Boat::right()
 {
     this->rotation -= 0.5;
-    sail.right();
+    sail.right(this->rotation);
 }
 
 bounding_box_t Boat::bounding_box() {

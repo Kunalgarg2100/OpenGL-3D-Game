@@ -31,7 +31,7 @@ void Sail::set_position(float x, float y, float z) {
 }
 
 void Sail::tick() {
-    //this->rotation += 5;
+    this->rotation += 5;
     this->position += this->speed;
     //this->speed += this->acc;
     if(this->speed.x > 0.5)
@@ -72,26 +72,30 @@ void Sail::jump()
         this->speed.y = 4;
 }
 
-void Sail::forward()
+void Sail::forward(float x)
 {
+    this->rotation = x;
     this->speed = glm::vec3(-0.5*sin(this->rotation*PI/180.0),0,-0.5*cos(this->rotation*PI/180.0));
     /*this->position.z -= 0.5*cos(this->rotation*PI/180.0);
     this->position.x -= 0.5*sin(this->rotation*PI/180.0);*/
 }
 
-void Sail::backward()
+void Sail::backward(float x)
 {
+    this->rotation = x;
     this->speed = glm::vec3(0.5*sin(this->rotation*PI/180.0),0,0.5*cos(this->rotation*PI/180.0));
     /*this->position.z += 0.5*cos(this->rotation*PI/180.0);
     this->position.x += 0.5*sin(this->rotation*PI/180.0);*/
 }
 
-void Sail::left()
+void Sail::left(float x)
 {
+    this->rotation = x;
     this->rotation += 0.5;
 }
 
-void Sail::right()
+void Sail::right(float x)
 {
+    this->rotation = x;
     this->rotation -= 0.5;
 }

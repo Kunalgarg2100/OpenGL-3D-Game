@@ -16,12 +16,12 @@ public:
     float canx,cany,canz;
     void set_position(float x, float y, float z);
     void tick();
-    void left();
-    void right();
+    void left(float x);
+    void right(float x);
     void down();
     void jump();
-    void forward();
-    void backward();
+    void forward(float x);
+    void backward(float x);
     void up();
     VAO *flag;
 };
