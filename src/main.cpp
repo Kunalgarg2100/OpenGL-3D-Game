@@ -19,7 +19,6 @@ GLFWwindow *window;
 
 Boat boat1;
 Water water1;
-Cannon cannon;
 vector<Sphere> fireball(100);
 double camera_rotation_angle = -170, camera_y = 8, camera_zoom = 0, camera_look_x = -170, camera_look_y = 60;
 color_t randcolor[] = {COLOR_BLACK,COLOR_RED,COLOR_GREEN, COLOR_WHITE, COLOR_CLAN,COLOR_YELLOW,COLOR_ORANGE};
@@ -57,8 +56,8 @@ void draw()
         up  = glm::vec3 (0, 1, 0);
         break;
     case 1:/* driver view*/
-        eye  = glm::vec3(boat1.position.x ,boat1.position.y+3,boat1.position.z-2*cos((cannon.rotation)* PI / 180.0));
-        target  = glm::vec3(boat1.position.x - 4*sin(cannon.rotation* PI / 180.0),boat1.position.y+2,boat1.position.z-6*cos((cannon.rotation)* PI / 180.0));
+        eye  = glm::vec3(boat1.position.x ,boat1.position.y+3,boat1.position.z-2*cos((boat1.rotation)* PI / 180.0));
+        target  = glm::vec3(boat1.position.x - 4*sin(boat1.rotation* PI / 180.0),boat1.position.y+2,boat1.position.z-6*cos((boat1.rotation)* PI / 180.0));
         up = glm::vec3 (0, 1, 0);
         break;
     case 2:/* top view*/
@@ -93,8 +92,7 @@ void draw()
     // Scene render
     water1.draw(VP);
     boat1.draw(VP);
-    //box.draw(VP);
-    cannon.draw(VP,0,0,0);//boat1.position.x,boat1.position.y,boat1.position.z);
+
     for(int i=0;i<rock.size();i++)
     {
         rock[i].draw(VP);
@@ -108,9 +106,9 @@ void draw()
 
 void fire_fireball()
 {
-    fireball[cnt].position = glm::vec3 (cannon.position.x- 6*sin(cannon.rotation* PI / 180.0),cannon.position.y+2,cannon.position.z + 6*cos((cannon.rotation+180)* PI / 180.0));//cannon.position.x, cannon.position.y , cannon.position.z);
+    fireball[cnt].position = glm::vec3 (boat1.position.x- 6*sin(boat1.rotation* PI / 180.0),boat1.position.y+2,boat1.position.z + 6*cos((boat1.rotation+180)* PI / 180.0));//cannon.position.x, cannon.position.y , cannon.position.z);
     fprintf(stderr,"fire,%f %f %f\n",fireball[cnt].position.x,fireball[cnt].position.y,fireball[cnt].position.z);
-    fireball[cnt].speed = glm::vec3(-0.5*sin(cannon.rotation*PI/180.0),0.4,-0.5*cos(cannon.rotation*PI/180.0));
+    fireball[cnt].speed = glm::vec3(-0.5*sin(boat1.rotation*PI/180.0),0.4,-0.5*cos(boat1.rotation*PI/180.0));
     cnt++;
 }
 
@@ -133,28 +131,23 @@ void tick_input(GLFWwindow *window) {
 
     if(jump){
         boat1.jump();
-        cannon.jump();
     }
 
     if (left) {
         boat1.left();
-        cannon.left();
     }
 
     if(right)
     {
         boat1.right();
-        cannon.right();
     }
     if(up) {
         //boat1.
-        boat1.forward();
-        cannon.forward();
+        boat1.forward();;
     }
     if(down) {
         //boat1.cannon.down();
         boat1.backward();
-        cannon.backward();
     }
 
     int width, height;
@@ -173,8 +166,7 @@ void tick_input(GLFWwindow *window) {
 
 void tick_elements() {
     boat1.tick();
-    cannon.tick();
-    //boat1.sail.rotation+=6;
+        //boat1.sail.rotation+=6;
     for (int i=0;i<cnt+1;i++)
     {
         fireball[i].tick();
@@ -201,7 +193,6 @@ void initGL(GLFWwindow *window, int width, int height)
 
     water1 = Water(0, 1, 0,COLOR_BLUE);
     boat1 = Boat(0, 4, 0);
-    cannon = Cannon(0,4,0);
     for(int i=0;i<rock.size();i++)
     {
         rock[i] = Rock(
@@ -287,6 +278,6 @@ void reset_screen() {
     float bottom = screen_center_y - 4 / screen_zoom;
     float left   = screen_center_x - 4 / screen_zoom;
     float right  = screen_center_x + 4 / screen_zoom;
-    Matrices.projection = glm::perspective(1.0f, 1.0f, 1.0f, 100.0f);
+    Matrices.projection = glm::perspective(1.0f, 1.0f, 1.0f, 500.0f);
     //Matrices.projection = glm::ortho(left, right, bottom, top, 0.1f, 500.0f);
 }

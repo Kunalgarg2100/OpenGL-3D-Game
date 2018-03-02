@@ -1,6 +1,7 @@
 #include "boat.h"
 #include "main.h"
 #include "sail.h"
+#include "cannon.h"
 
 Boat::Boat(float x, float y, float z) {
     this->position = glm::vec3(x, y, z);
@@ -84,6 +85,7 @@ Boat::Boat(float x, float y, float z) {
     this->face = create3DObject(GL_TRIANGLES, 6 * 3, face_vertex_buffer_data,COLOR_GREEN);
     this->pole = create3DObject(GL_TRIANGLES, 2400, pole_vertex_buffer_data,COLOR_BACKGROUND, GL_FILL);
     sail = Sail(x,y,z);
+    cannon = Cannon(x,y,z);
 }
 
 void Boat::draw(glm::mat4 VP) {
@@ -99,11 +101,8 @@ void Boat::draw(glm::mat4 VP) {
     draw3DObject(this->side);
     draw3DObject(this->face);
     draw3DObject(this->pole);
-    //draw3DObject(this->sail.flag);
     sail.draw(VP);
-    //draw3DObject(this->cannon.object);
-    //cannon.draw(cannon);
-
+    cannon.draw(VP);
 }
 
 void Boat::set_position(float x, float y, float z) {
@@ -144,6 +143,7 @@ void Boat::tick() {
         this->speed.y -= 0.5;
     }
     sail.tick();
+    cannon.tick();
 }
 
 void Boat::jump()
@@ -157,6 +157,7 @@ void Boat::forward()
 {
     this->speed = glm::vec3(-0.5*sin(this->rotation*PI/180.0),0,-0.5*cos(this->rotation*PI/180.0));
     sail.forward(this->rotation);
+    cannon.forward();
     /*this->position.z -= 0.5*cos(this->rotation*PI/180.0);
     this->position.x -= 0.5*sin(this->rotation*PI/180.0);*/
 }
@@ -165,6 +166,7 @@ void Boat::backward()
 {
     this->speed = glm::vec3(0.5*sin(this->rotation*PI/180.0),0,0.5*cos(this->rotation*PI/180.0));
     sail.backward(this->rotation);
+    cannon.backward();
     /*this->position.z += 0.5*cos(this->rotation*PI/180.0);
     this->position.x += 0.5*sin(this->rotation*PI/180.0);*/
 }
@@ -173,12 +175,14 @@ void Boat::left()
 {
     this->rotation += 0.5;
     sail.left(this->rotation);
+    cannon.left();
 }
 
 void Boat::right()
 {
     this->rotation -= 0.5;
     sail.right(this->rotation);
+    cannon.right();
 }
 
 bounding_box_t Boat::bounding_box() {

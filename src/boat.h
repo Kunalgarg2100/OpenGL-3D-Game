@@ -1,5 +1,6 @@
 #include "main.h"
 #include "sail.h"
+#include "cannon.h"
 
 #ifndef BOAT_H
 #define BOAT_H
@@ -12,6 +13,7 @@ public:
     glm::vec3 position,speed,acc;
     float rotation;
     Sail sail;
+    Cannon cannon;
     void draw(glm::mat4 VP);
     float height;
     float radius;
@@ -20,12 +22,9 @@ public:
     void tick();
     void left();
     void right();
-    void down();
     void jump();
     void forward();
     void backward();
-    void up();
-    void add_sail(float x, float y, float z);
     bounding_box_t bounding_box();
 private:
     VAO *base;

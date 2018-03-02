@@ -10,7 +10,7 @@ public:
     Cannon(float x, float y, float z);
     glm::vec3 position,speed,acc;
     float rotation,height,radius,rotation_y;
-    void draw(glm::mat4 VP,float x, float y, float z);
+    void draw(glm::mat4 VP);
     void set_position(float x, float y, float z);
     void tick();
     void left();

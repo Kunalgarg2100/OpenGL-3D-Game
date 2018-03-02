@@ -4,9 +4,9 @@
 Sphere::Sphere(float x, float y, float z, float radius){
     this->position = glm::vec3(x, y, z);
     this->rotation = 0;
-    static GLfloat base_vertex_buffer_data[250001];
+    static GLfloat base_vertex_buffer_data[15001];
     int i = 0, flag = 0;
-    float change = 10;
+    float change = 100;
     for(float alpha = 0;alpha < 181.0; alpha+=1){
         this->end1 = glm::vec3(x , radius*cos(alpha * PI / 180.0), z);
         this->end2 = glm::vec3(x , radius*cos((alpha+1)*PI/180.0), z);
