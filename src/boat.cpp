@@ -8,6 +8,7 @@ Boat::Boat(float x, float y, float z) {
     this->rotation = 0;
     this->speed = glm::vec3(0, 0, 0);
     this->acc = glm::vec3(0, 0, 0);
+    iswind = false;
     // Our vertices. Three consecutive floats give a 3D vertex; Three consecutive vertices give a triangle.
     // A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and 12*3 vertices
     GLfloat base_vertex_buffer_data[] = {
@@ -111,6 +112,11 @@ void Boat::set_position(float x, float y, float z) {
 
 void Boat::tick() {
     this->position += this->speed;
+    if(iswind){
+    this->speed.x = 0.2*cos(windir* M_PI / 180.0f);
+    this->speed.z = 0.2*sin(windir* M_PI / 180.0f);
+    }
+    else{
     //this->speed += this->acc;
     if(this->speed.x > 0.5)
         this->speed.x -= 0.5;
@@ -142,8 +148,9 @@ void Boat::tick() {
     {
         this->speed.y -= 0.5;
     }
-    sail.tick();
-    cannon.tick();
+    }
+    sail.tick(iswind,windir);
+    cannon.tick(iswind,windir);
 }
 
 void Boat::jump()
@@ -155,20 +162,20 @@ void Boat::jump()
 
 void Boat::forward()
 {
+    if(!iswind){
     this->speed = glm::vec3(-0.5*sin(this->rotation*PI/180.0),0,-0.5*cos(this->rotation*PI/180.0));
     sail.forward(this->rotation);
     cannon.forward();
-    /*this->position.z -= 0.5*cos(this->rotation*PI/180.0);
-    this->position.x -= 0.5*sin(this->rotation*PI/180.0);*/
+    }
 }
 
 void Boat::backward()
 {
+    if(!iswind){
     this->speed = glm::vec3(0.5*sin(this->rotation*PI/180.0),0,0.5*cos(this->rotation*PI/180.0));
     sail.backward(this->rotation);
     cannon.backward();
-    /*this->position.z += 0.5*cos(this->rotation*PI/180.0);
-    this->position.x += 0.5*sin(this->rotation*PI/180.0);*/
+    }
 }
 
 void Boat::left()

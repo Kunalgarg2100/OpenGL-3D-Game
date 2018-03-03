@@ -1,11 +1,10 @@
 #include "rock.h"
 #include "main.h"
 
-Rock::Rock(float x, float y, float z, color_t color) {
+Rock::Rock(float x, float y, float z, float rad, color_t color) {
     this->position = glm::vec3(x, y, z);
     this->rotation = 0;
     speed = 1;
-    double rad = 1.0f;
     this->side = rad;
     // Our vertices. Three consecutive floats give a 3D vertex; Three consecutive vertices give a triangle.
     // A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and 12*3 vertices

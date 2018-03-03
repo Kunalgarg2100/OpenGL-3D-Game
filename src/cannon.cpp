@@ -54,8 +54,13 @@ void Cannon::set_position(float x, float y, float z) {
     this->position = glm::vec3(x, y, z);
 }
 
-void Cannon::tick() {
+void Cannon::tick(bool iswind,double windir) {
     this->position += this->speed;
+    if(iswind){
+        this->speed.x = 0.2*cos(windir* M_PI / 180.0f);
+        this->speed.z = 0.2*sin(windir* M_PI / 180.0f);
+    }
+    else{
     //this->speed += this->acc;
     if(this->speed.x > 0.5)
         this->speed.x -= 0.5;
@@ -87,6 +92,7 @@ void Cannon::tick() {
     {
         this->speed.y -= 0.5;
     }
+    }
 }
 
 void Cannon::jump()
@@ -98,14 +104,10 @@ void Cannon::jump()
 void Cannon::forward()
 {
     this->speed = glm::vec3(-0.5*sin(this->rotation*PI/180.0),0,-0.5*cos(this->rotation*PI/180.0));
-    /*this->position.z -= 0.5*cos(this->rotation*PI/180.0);
-    this->position.x -= 0.5*sin(this->rotation*PI/180.0);*/
 }
 void Cannon::backward()
 {
     this->speed = glm::vec3(0.5*sin(this->rotation*PI/180.0),0,0.5*cos(this->rotation*PI/180.0));
-    /*this->position.z += 0.5*cos(this->rotation*PI/180.0);
-    this->position.x += 0.5*sin(this->rotation*PI/180.0);*/
 }
 
 void Cannon::left()

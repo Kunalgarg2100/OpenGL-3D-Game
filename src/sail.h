@@ -15,7 +15,7 @@ public:
     float radius;
     float canx,cany,canz;
     void set_position(float x, float y, float z);
-    void tick();
+    void tick(bool iswind,double angle);
     void left(float x);
     void right(float x);
     void down();

@@ -12,7 +12,7 @@ public:
     float rotation,height,radius,rotation_y;
     void draw(glm::mat4 VP);
     void set_position(float x, float y, float z);
-    void tick();
+    void tick(bool iswind,double angle);
     void left();
     void right();
     void down();

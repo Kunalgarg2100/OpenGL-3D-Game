@@ -30,9 +30,17 @@ void Sail::set_position(float x, float y, float z) {
     this->position = glm::vec3(x, y, z);
 }
 
-void Sail::tick() {
-    this->rotation += 5;
+void Sail::tick(bool iswind,double windir) {
     this->position += this->speed;
+    if(iswind){
+        if(windir <90)
+        this->rotation = windir;
+        else
+        this->rotation = windir+180;
+        this->speed.x = 0.2*cos(windir* M_PI / 180.0f);
+        this->speed.z = 0.2*sin(windir* M_PI / 180.0f);
+    }
+    else{
     //this->speed += this->acc;
     if(this->speed.x > 0.5)
         this->speed.x -= 0.5;
@@ -63,6 +71,7 @@ void Sail::tick() {
     if(this->position.y > 4 && this->speed.y == 0)
     {
         this->speed.y -= 0.5;
+    }
     }
 }
 

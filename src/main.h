@@ -76,6 +76,7 @@ struct bounding_box_t {
 bool detect_collision(bounding_box_t a, bounding_box_t b);
 void fire_fireball();
 void change_view();
+double getRandDouble(double l, double r);
 extern double camera_rotation_angle, camera_y, camera_zoom,camera_look_x, camera_look_y;
 extern float screen_zoom, screen_center_x, screen_center_y;
 extern int prev_xpos, prev_ypos;

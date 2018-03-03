@@ -32,6 +32,8 @@ glm::vec3 eye,target,up;
 int defView = 3;
 
 Timer t60(1.0 / 60);
+Timer t2(3.0);
+Timer t3(9.1);
 
 /* Render the scene with openGL */
 /* Edit this function according to your assignment */
@@ -199,6 +201,7 @@ void initGL(GLFWwindow *window, int width, int height)
                     getRandDouble(-300,300),
                     3,
                     getRandDouble(-300,300),
+                    getRandDouble(2,4),
                     randcolor[rand()%7]
                 );
     }
@@ -259,6 +262,17 @@ int main(int argc, char **argv) {
             tick_elements();
             tick_input(window);
         }
+
+        if (t2.processTick()){
+            boat1.iswind = false;
+        }
+        if (t3.processTick()){
+            boat1.iswind = true;
+            boat1.windir = getRandDouble(0,180);
+            printf("Dfdsgdgdf\n");
+           // boat1.blow_wind();
+        }
+
 
         // Poll for Keyboard and mouse events
         glfwPollEvents();

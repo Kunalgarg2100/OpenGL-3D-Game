@@ -7,7 +7,7 @@
 class Rock {
 public:
     Rock() {}
-    Rock(float x, float y,float z, color_t color);
+    Rock(float x, float y,float z, float side, color_t color);
     glm::vec3 position;
     float rotation;
     void draw(glm::mat4 VP);
