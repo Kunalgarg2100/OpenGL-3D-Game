@@ -16,12 +16,14 @@ public:
     void left();
     void right();
     void down();
+    float norm_speed;
     void up();
     void move_up();
     void move_dwn();
     void forward();
     void backward();
     void jump();
+    void set_speed(float a);
     VAO *object;
 };
 

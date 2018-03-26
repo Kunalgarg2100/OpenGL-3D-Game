@@ -14,6 +14,7 @@ public:
     float height;
     float radius;
     float canx,cany,canz;
+    float norm_speed;
     void set_position(float x, float y, float z);
     void tick(bool iswind,double angle);
     void left(float x);
@@ -23,6 +24,7 @@ public:
     void forward(float x);
     void backward(float x);
     void up();
+    void set_speed(float a);
     VAO *flag;
 };
 

@@ -18,6 +18,7 @@ public:
     float height;
     float radius;
     double windir;
+    float norm_speed;
     float canx,cany,canz;
     void set_position(float x, float y, float z);
     void tick();
@@ -28,6 +29,7 @@ public:
     void backward();
     bool iswind;
     void blow_wind();
+    void set_speed(float a);
     bounding_box_t bounding_box();
 private:
     VAO *base;

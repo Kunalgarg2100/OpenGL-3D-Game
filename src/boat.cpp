@@ -8,6 +8,7 @@ Boat::Boat(float x, float y, float z) {
     this->rotation = 0;
     this->speed = glm::vec3(0, 0, 0);
     this->acc = glm::vec3(0, 0, 0);
+    this->norm_speed = 0.5;
     iswind = false;
     // Our vertices. Three consecutive floats give a 3D vertex; Three consecutive vertices give a triangle.
     // A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and 12*3 vertices
@@ -74,9 +75,9 @@ Boat::Boat(float x, float y, float z) {
             pole_vertex_buffer_data[ptr++]=0.0f;
         for(int j=0;j<2;j++)
         {
-            pole_vertex_buffer_data[ptr++]=0.2*cos(angle);
+            pole_vertex_buffer_data[ptr++]=0.3f*cos(angle);
             pole_vertex_buffer_data[ptr++]=5.0f;
-            pole_vertex_buffer_data[ptr++]=0.5f*sin(angle);
+            pole_vertex_buffer_data[ptr++]=0.3f*sin(angle);
             angle = (i+1) * PI/400;
         }
     };
@@ -118,22 +119,23 @@ void Boat::tick() {
     }
     else{
     //this->speed += this->acc;
-    if(this->speed.x > 0.5)
-        this->speed.x -= 0.5;
-    else if(this->speed.x < -0.5)
-        this->speed.x += 0.5;
+    if(this->speed.x > this->norm_speed)
+        this->speed.x -= this->norm_speed;
+    else if(this->speed.x < -this->norm_speed)
+        this->speed.x += this->norm_speed;
     else
         this->speed.x = 0;
-    if(this->speed.z > 0.5)
-        this->speed.z -= 0.5;
-    else if(this->speed.z < -0.5)
-        this->speed.z += 0.5;
+    if(this->speed.z > this->norm_speed)
+        this->speed.z -= this->norm_speed;
+    else if(this->speed.z < -this->norm_speed)
+        this->speed.z += this->norm_speed;
     else
         this->speed.z = 0;
-    if(this->speed.y > 0.5)
-        this->speed.y -= 0.5;
-    else if(this->speed.y < -0.5)
-        this->speed.y += 0.5;
+    }
+    if(this->speed.y > this->norm_speed)
+        this->speed.y -= this->norm_speed;
+    else if(this->speed.y < -this->norm_speed)
+        this->speed.y += this->norm_speed;
     else
         this->speed.y = 0;
     if(this->position.y < 4.1)
@@ -146,8 +148,7 @@ void Boat::tick() {
     }
     if(this->position.y > 4 && this->speed.y == 0)
     {
-        this->speed.y -= 0.5;
-    }
+        this->speed.y -= this->norm_speed;
     }
     sail.tick(iswind,windir);
     cannon.tick(iswind,windir);
@@ -158,12 +159,13 @@ void Boat::jump()
     if(this->position.y <= 4.1)
         this->speed.y = 4;
     sail.jump();
+    cannon.jump();
 }
 
 void Boat::forward()
 {
     if(!iswind){
-    this->speed = glm::vec3(-0.5*sin(this->rotation*PI/180.0),0,-0.5*cos(this->rotation*PI/180.0));
+    this->speed = glm::vec3(-this->norm_speed*sin(this->rotation*PI/180.0),0,-this->norm_speed*cos(this->rotation*PI/180.0));
     sail.forward(this->rotation);
     cannon.forward();
     }
@@ -172,7 +174,7 @@ void Boat::forward()
 void Boat::backward()
 {
     if(!iswind){
-    this->speed = glm::vec3(0.5*sin(this->rotation*PI/180.0),0,0.5*cos(this->rotation*PI/180.0));
+    this->speed = glm::vec3(this->norm_speed*sin(this->rotation*PI/180.0),0,this->norm_speed*cos(this->rotation*PI/180.0));
     sail.backward(this->rotation);
     cannon.backward();
     }
@@ -180,16 +182,22 @@ void Boat::backward()
 
 void Boat::left()
 {
-    this->rotation += 0.5;
+    this->rotation += this->norm_speed;
     sail.left(this->rotation);
     cannon.left();
 }
 
 void Boat::right()
 {
-    this->rotation -= 0.5;
+    this->rotation -= this->norm_speed;
     sail.right(this->rotation);
     cannon.right();
+}
+
+void Boat::set_speed(float a){
+    this->norm_speed = a;
+    sail.set_speed(a);
+    cannon.set_speed(a);
 }
 
 bounding_box_t Boat::bounding_box() {

@@ -6,6 +6,7 @@ Sail::Sail(float x, float y, float z) {
     this->rotation = 0;
     this->speed = glm::vec3(0, 0, 0);
     this->acc = glm::vec3(0, 0, 0);
+    this->norm_speed = 0.5f;
 
     GLfloat flag_vertex_buffer_data[] = {
         0.0f, 5.0f, 0.0f,
@@ -33,31 +34,29 @@ void Sail::set_position(float x, float y, float z) {
 void Sail::tick(bool iswind,double windir) {
     this->position += this->speed;
     if(iswind){
-        if(windir <90)
         this->rotation = windir;
-        else
-        this->rotation = windir+180;
         this->speed.x = 0.2*cos(windir* M_PI / 180.0f);
         this->speed.z = 0.2*sin(windir* M_PI / 180.0f);
     }
     else{
     //this->speed += this->acc;
-    if(this->speed.x > 0.5)
-        this->speed.x -= 0.5;
-    else if(this->speed.x < -0.5)
-        this->speed.x += 0.5;
+    if(this->speed.x > this->norm_speed)
+        this->speed.x -= this->norm_speed;
+    else if(this->speed.x < -this->norm_speed)
+        this->speed.x += this->norm_speed;
     else
         this->speed.x = 0;
-    if(this->speed.z > 0.5)
-        this->speed.z -= 0.5;
-    else if(this->speed.z < -0.5)
-        this->speed.z += 0.5;
+    if(this->speed.z > this->norm_speed)
+        this->speed.z -= this->norm_speed;
+    else if(this->speed.z < -this->norm_speed)
+        this->speed.z += this->norm_speed;
     else
         this->speed.z = 0;
-    if(this->speed.y > 0.5)
-        this->speed.y -= 0.5;
-    else if(this->speed.y < -0.5)
-        this->speed.y += 0.5;
+    }
+    if(this->speed.y > this->norm_speed)
+        this->speed.y -= this->norm_speed;
+    else if(this->speed.y < -this->norm_speed)
+        this->speed.y += this->norm_speed;
     else
         this->speed.y = 0;
     if(this->position.y < 4.1)
@@ -70,8 +69,7 @@ void Sail::tick(bool iswind,double windir) {
     }
     if(this->position.y > 4 && this->speed.y == 0)
     {
-        this->speed.y -= 0.5;
-    }
+        this->speed.y -= this->norm_speed;
     }
 }
 
@@ -84,27 +82,31 @@ void Sail::jump()
 void Sail::forward(float x)
 {
     this->rotation = x;
-    this->speed = glm::vec3(-0.5*sin(this->rotation*PI/180.0),0,-0.5*cos(this->rotation*PI/180.0));
-    /*this->position.z -= 0.5*cos(this->rotation*PI/180.0);
-    this->position.x -= 0.5*sin(this->rotation*PI/180.0);*/
+    this->speed = glm::vec3(-this->norm_speed*sin(this->rotation*PI/180.0),0,-this->norm_speed*cos(this->rotation*PI/180.0));
+    /*this->position.z -= this->norm_speed*cos(this->rotation*PI/180.0);
+    this->position.x -= this->norm_speed*sin(this->rotation*PI/180.0);*/
 }
 
 void Sail::backward(float x)
 {
     this->rotation = x;
-    this->speed = glm::vec3(0.5*sin(this->rotation*PI/180.0),0,0.5*cos(this->rotation*PI/180.0));
-    /*this->position.z += 0.5*cos(this->rotation*PI/180.0);
-    this->position.x += 0.5*sin(this->rotation*PI/180.0);*/
+    this->speed = glm::vec3(this->norm_speed*sin(this->rotation*PI/180.0),0,this->norm_speed*cos(this->rotation*PI/180.0));
+    /*this->position.z += this->norm_speed*cos(this->rotation*PI/180.0);
+    this->position.x += this->norm_speed*sin(this->rotation*PI/180.0);*/
 }
 
 void Sail::left(float x)
 {
     this->rotation = x;
-    this->rotation += 0.5;
+    this->rotation += this->norm_speed;
 }
 
 void Sail::right(float x)
 {
     this->rotation = x;
-    this->rotation -= 0.5;
+    this->rotation -= this->norm_speed;
+}
+
+void Sail::set_speed(float a){
+    this->norm_speed = a;
 }

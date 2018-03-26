@@ -7,6 +7,7 @@ Cannon::Cannon(float x, float y, float z){
     this->rotation_y = 0;
     this->speed = glm::vec3(0, 0, 0);
     this->acc = glm::vec3(0, 0, 0);
+    this->norm_speed = 0.5f;
     height = 2;
     radius = 0.25;
     int p = 0;
@@ -57,27 +58,28 @@ void Cannon::set_position(float x, float y, float z) {
 void Cannon::tick(bool iswind,double windir) {
     this->position += this->speed;
     if(iswind){
-        this->speed.x = 0.2*cos(windir* M_PI / 180.0f);
-        this->speed.z = 0.2*sin(windir* M_PI / 180.0f);
+    this->speed.x = 0.2*cos(windir* M_PI / 180.0f);
+    this->speed.z = 0.2*sin(windir* M_PI / 180.0f);
     }
     else{
     //this->speed += this->acc;
-    if(this->speed.x > 0.5)
-        this->speed.x -= 0.5;
-    else if(this->speed.x < -0.5)
-        this->speed.x += 0.5;
+    if(this->speed.x > this->norm_speed)
+        this->speed.x -= this->norm_speed;
+    else if(this->speed.x < -this->norm_speed)
+        this->speed.x += this->norm_speed;
     else
         this->speed.x = 0;
-    if(this->speed.z > 0.5)
-        this->speed.z -= 0.5;
-    else if(this->speed.z < -0.5)
-        this->speed.z += 0.5;
+    if(this->speed.z > this->norm_speed)
+        this->speed.z -= this->norm_speed;
+    else if(this->speed.z < -this->norm_speed)
+        this->speed.z += this->norm_speed;
     else
         this->speed.z = 0;
-    if(this->speed.y > 0.5)
-        this->speed.y -= 0.5;
-    else if(this->speed.y < -0.5)
-        this->speed.y += 0.5;
+    }
+    if(this->speed.y > this->norm_speed)
+        this->speed.y -= this->norm_speed;
+    else if(this->speed.y < -this->norm_speed)
+        this->speed.y += this->norm_speed;
     else
         this->speed.y = 0;
     if(this->position.y < 4.1)
@@ -90,8 +92,7 @@ void Cannon::tick(bool iswind,double windir) {
     }
     if(this->position.y > 4 && this->speed.y == 0)
     {
-        this->speed.y -= 0.5;
-    }
+        this->speed.y -= this->norm_speed;
     }
 }
 
@@ -103,19 +104,23 @@ void Cannon::jump()
 
 void Cannon::forward()
 {
-    this->speed = glm::vec3(-0.5*sin(this->rotation*PI/180.0),0,-0.5*cos(this->rotation*PI/180.0));
+    this->speed = glm::vec3(-this->norm_speed*sin(this->rotation*PI/180.0),0,-this->norm_speed*cos(this->rotation*PI/180.0));
 }
 void Cannon::backward()
 {
-    this->speed = glm::vec3(0.5*sin(this->rotation*PI/180.0),0,0.5*cos(this->rotation*PI/180.0));
+    this->speed = glm::vec3(this->norm_speed*sin(this->rotation*PI/180.0),0,this->norm_speed*cos(this->rotation*PI/180.0));
 }
 
 void Cannon::left()
 {
-    this->rotation += 0.5;
+    this->rotation += this->norm_speed;
 }
 
 void Cannon::right()
 {
-    this->rotation -= 0.5;
+    this->rotation -= this->norm_speed;
+}
+
+void Cannon::set_speed(float a){
+    this->norm_speed = a;
 }
