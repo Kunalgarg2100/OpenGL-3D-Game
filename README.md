@@ -2,6 +2,8 @@ Legend of Zelda Opengl 3D Game
 =========================
 This game is based on [Legend of Zelda]( https://www.youtube.com/watch?v=-F6mewS47Fg#t=10m15s).  More details in [problem.pdf](Assignment-1.pdf). 
 
+![](screenshots/game1.png)
+
 The prime objective is to score as much as possible before the ship runs out of fuel.
 
 [TOC]
