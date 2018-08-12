@@ -23,7 +23,7 @@ You need to install the development packages of the following libraries:
 
 5. MPG123
 
-####Installing packages
+#### Installing packages
 
 ```bash
 sudo apt install cmake pkg-config
@@ -31,7 +31,7 @@ sudo apt install libglew-dev libglfw3-dev libglm-dev
 sudo apt install libao-dev libmpg123-dev
 ```
 
-####Run the code
+#### Run the code
 
 ```bash
 cd path/to/project
@@ -43,7 +43,7 @@ make
 ./game
 ```
 
-###Extra Features
+### Extra Features
 
 ------
 
@@ -56,7 +56,7 @@ make
 - Boss monster comes after killing small monsters
 - 6 different camera views
 
-###World
+### World
 
 -----
 
@@ -75,7 +75,7 @@ make
 
 **Objective** is displayed on **title bar** of window.
 
-###Scoring
+### Scoring
 
 ------
 
@@ -111,7 +111,7 @@ Killing with bossmonster:  Increases score by 30
   - mouse click and drag - move camera
   - mouse scroll - move camera near/far
 
-###License
+### License
 
 -----
 
