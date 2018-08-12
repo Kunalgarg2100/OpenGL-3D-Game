@@ -16,6 +16,7 @@
 bool   cannon_keyboard_input = true;
 bool   drag_pan = false, old_cki;
 double drag_oldx = -1, drag_oldy = -1;
+bool camera_ortho;
 
 using namespace std;
 
@@ -25,25 +26,14 @@ void keyboard(GLFWwindow *window, int key, int scancode, int action, int mods) {
     // Function is called first on GLFW_PRESS.
 
     if (action == GLFW_RELEASE) {
-         switch (key) {
-         case GLFW_KEY_F:
-             fire_fireball();
-             break;
-         case GLFW_KEY_V:
-             change_view();
-             break;
-        // rectangle_rot_status = !rectangle_rot_status;
-        // break;
-        // case GLFW_KEY_P:
-        // triangle_rot_status = !triangle_rot_status;
-        // break;
-        // case GLFW_KEY_X:
-        //// do something ..
-        // break;
-        // default:
-        // break;
-        // }
-    }
+        switch (key) {
+        case GLFW_KEY_F:
+            fire_fireball();
+            break;
+        default:
+            break;
+        }
+
     }
     else if (action == GLFW_PRESS) {
         switch (key) {
@@ -63,6 +53,12 @@ void keyboardChar(GLFWwindow *window, unsigned int key) {
     case 'q':
         quit(window);
         break;
+    case 'c':
+        camera_ortho = !camera_ortho;
+        break;
+    case 'v':
+        camera_view = (camera_view_t) ((camera_view + 1) % 6);
+        break;
     default:
         break;
     }
@@ -72,11 +68,11 @@ int prev_xpos = 0, prev_ypos = 0;
 /* Executed when a mouse button is pressed/released */
 void mouseButton(GLFWwindow *window, int button, int action, int mods) {
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-           double xpos, ypos;
-           glfwGetCursorPos(window, &xpos, &ypos);
-           prev_xpos = xpos;
-           prev_ypos = ypos;
-   }
+        double xpos, ypos;
+        glfwGetCursorPos(window, &xpos, &ypos);
+        prev_xpos = xpos;
+        prev_ypos = ypos;
+    }
 }
 
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {

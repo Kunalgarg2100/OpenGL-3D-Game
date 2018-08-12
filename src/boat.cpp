@@ -5,74 +5,72 @@
 
 Boat::Boat(float x, float y, float z) {
     this->position = glm::vec3(x, y, z);
-    this->rotation = 0;
     this->speed = glm::vec3(0, 0, 0);
     this->acc = glm::vec3(0, 0, 0);
     this->norm_speed = 0.5;
+    this->rotation = 0;
     iswind = false;
-    // Our vertices. Three consecutive floats give a 3D vertex; Three consecutive vertices give a triangle.
-    // A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and 12*3 vertices
-    GLfloat base_vertex_buffer_data[] = {
-        -1.0f, -1.0f, -2.0f,
-        1.0f, -1.0f, -2.0f,
-        -1.0f, -1.0f, 2.0f,
 
-        -1.0f, -1.0f,2.0f,
-        1.0f, -1.0f, 2.0f,
-        1.0f, -1.0f, -2.0f
+    GLfloat base_vertex_buffer_data[] = {
+        -1.01f, -1.01f, -2.01f,
+        1.01f, -1.01f, -2.01f,
+        -1.01f, -1.01f, 2.01f,
+
+        -1.01f, -1.01f,2.01f,
+        1.01f, -1.01f, 2.01f,
+        1.01f, -1.01f, -2.01f
     };
     GLfloat side_vertex_buffer_data[] = {
-        -1.0f, -1.0f, -2.0f,
-        -1.0f, -1.0f, 2.0f,
-        -2.0f, 1.0f, 3.0f,
+        -1.01f, -1.01f, -2.01f,
+        -1.01f, -1.01f, 2.01f,
+        -2.01f, 1.01f, 3.01f,
 
-        -1.0f, -1.0f, -2.0f,
-        -2.0f, 1.0f, 3.0f,
-        -2.0f, 1.0f, -3.0f,
+        -1.01f, -1.01f, -2.01f,
+        -2.01f, 1.01f, 3.01f,
+        -2.01f, 1.01f, -3.01f,
 
-        1.0f, -1.0f, -2.0f,
-        1.0f, -1.0f, 2.0f,
-        2.0f, 1.0f, 3.0f,
+        1.01f, -1.01f, -2.01f,
+        1.01f, -1.01f, 2.01f,
+        2.01f, 1.01f, 3.01f,
 
-        1.0f, -1.0f, -2.0f,
-        2.0f, 1.0f, 3.0f,
-        2.0f, 1.0f, -3.0f,
+        1.01f, -1.01f, -2.01f,
+        2.01f, 1.01f, 3.01f,
+        2.01f, 1.01f, -3.01f,
 
     };
     GLfloat face_vertex_buffer_data[] = {
-        -2.0f,   1.0f,-3.0f,
-        -1.0f, -1.0f, -2.0f,
-        0.0f, 2.0f,-4.0f,
+        -2.01f,   1.01f,-3.01f,
+        -1.01f, -1.01f, -2.01f,
+        0.01f, 2.01f,-4.01f,
 
-        2.0f, 1.0f,-3.0f,
-        1.0f,  -1.0f,-2.0f,
-        0.0f, 2.0f,-4.0f,
+        2.01f, 1.01f,-3.01f,
+        1.01f,  -1.01f,-2.01f,
+        0.01f, 2.01f,-4.01f,
 
-        0.0f, 2.0f,-4.0f,
-        -1.0f, -1.0f,-2.0f,
-        1.0f, -1.0f,-2.0f,
+        0.01f, 2.01f,-4.01f,
+        -1.01f, -1.01f,-2.01f,
+        1.01f, -1.01f,-2.01f,
 
-        -2.0f, 1.0f, 3.0f,
-        -1.0f,-1.0f, 2.0f,
-        0.0f, 2.0f, 4.0f,
+        -2.01f, 1.01f, 3.01f,
+        -1.01f,-1.01f, 2.01f,
+        0.01f, 2.01f, 4.01f,
 
-        2.0f, 1.0f,3.0f,
-        1.0f,  -1.0f,2.0f,
-        0.0f,  2.0f,4.0f,
+        2.01f, 1.01f,3.01f,
+        1.01f,  -1.01f,2.01f,
+        0.01f,  2.01f,4.01f,
 
-        0.0f, 2.0f,4.0f,
-        -1.0f,-1.0f, 2.0f,
-        1.0f,-1.0f, 2.0f,
+        0.01f, 2.01f,4.01f,
+        -1.01f,-1.01f, 2.01f,
+        1.01f,-1.01f, 2.01f,
 
     };
 
-    const double PI = 4 * atan(1);
     int ptr=0;
     GLfloat pole_vertex_buffer_data[7200];
     for(int i=0;i<800;i++){
-        double angle = i * PI/400;
+        double angle = i * M_PI/400;
         for(int j=0;j<3;j++)
-            pole_vertex_buffer_data[ptr++]=0.0f;
+            pole_vertex_buffer_data[ptr++]=0.01f;
         for(int j=0;j<2;j++)
         {
             pole_vertex_buffer_data[ptr++]=0.3f*cos(angle);
@@ -82,12 +80,12 @@ Boat::Boat(float x, float y, float z) {
         }
     };
 
-    this->base = create3DObject(GL_TRIANGLES, 2 * 3, base_vertex_buffer_data, COLOR_BLACK);
+    this->base = create3DObject(GL_TRIANGLES, 2 * 3, base_vertex_buffer_data, COLOR_BROWN);
     this->side = create3DObject(GL_TRIANGLES, 4 * 3, side_vertex_buffer_data,COLOR_RED);
-    this->face = create3DObject(GL_TRIANGLES, 6 * 3, face_vertex_buffer_data,COLOR_GREEN);
+    this->face = create3DObject(GL_TRIANGLES, 6 * 3, face_vertex_buffer_data,{204, 204, 0});
     this->pole = create3DObject(GL_TRIANGLES, 2400, pole_vertex_buffer_data,COLOR_BACKGROUND, GL_FILL);
     sail = Sail(x,y,z);
-    cannon = Cannon(x,y,z);
+    cannon = Cannon(x,y,z,COLOR_RED);
 }
 
 void Boat::draw(glm::mat4 VP) {
@@ -201,12 +199,11 @@ void Boat::set_speed(float a){
 }
 
 bounding_box_t Boat::bounding_box() {
+    float w,h,l;
     float x = this->position.x;
     float y = this->position.y;
     float z = this->position.z;
-    float w = 4;
-    float h = 3;
-    float l = 8;
+    w = 4,h=3,l=8;
     bounding_box_t bbox = { x,y,z,w,h,l};
     return bbox;
 }

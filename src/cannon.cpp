@@ -1,10 +1,9 @@
 #include "cannon.h"
 #include "main.h"
 
-Cannon::Cannon(float x, float y, float z){
+Cannon::Cannon(float x, float y, float z,color_t color){
     this->position = glm::vec3(x, y, z);
     this->rotation = 0;
-    this->rotation_y = 0;
     this->speed = glm::vec3(0, 0, 0);
     this->acc = glm::vec3(0, 0, 0);
     this->norm_speed = 0.5f;
@@ -36,7 +35,7 @@ Cannon::Cannon(float x, float y, float z){
             theta -= change;
         }
     }
-    this->object = create3DObject(GL_TRIANGLES, i/3, cannon_vertex_buffer_data,COLOR_RED);
+    this->object = create3DObject(GL_TRIANGLES, i/3, cannon_vertex_buffer_data,color);
 
 
 }

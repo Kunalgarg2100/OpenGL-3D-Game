@@ -1,30 +1,28 @@
 #include "main.h"
+#include"sphere.h"
+#ifndef MONSTER_H
+#define MONSTER_H
 
-#ifndef ROCK_H
-#define ROCK_H
 
-
-class Rock {
+class Monster {
 public:
-    Rock() {}
-    Rock(float x, float y,float z, float side,float rad1, bool flag, color_t color);
+    Monster() {}
+    Monster(float x, float y,float z, float side, int u,int num,color_t color1,color_t color2,color_t color3);
     glm::vec3 position;
     float rotation;
     color_t color;
+    int num;
     void draw(glm::mat4 VP);
-    bool flag;
     void set_position(float x, float y);
     void tick();
+    int shootcnt,reqcnt;
     double speed;
-    void left();
-    void right();
     double side;
-    float rad1;
+    Sphere head;
     bounding_box_t bounding_box();
 private:
     VAO *object;
-    VAO *object1;
-
+    VAO *pole;
 };
 
 #endif // BALL_H

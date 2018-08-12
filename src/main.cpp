@@ -2,11 +2,11 @@
 #include "timer.h"
 #include "boat.h"
 #include "water.h"
-#include "rock.h"
-#include "building.h"
+#include "monster.h"
 #include "cannon.h"
 #include "sphere.h"
-
+#include "rock.h"
+#include "segmentdisplay.h"
 using namespace std;
 
 GLMatrices Matrices;
@@ -17,21 +17,32 @@ GLFWwindow *window;
 * Customizable functions *
 **************************/
 
-Boat boat1;
+Boat boat;
 Water water1;
-vector<Sphere> fireball(100);
-double camera_rotation_angle = -170, camera_y = 8, camera_zoom = 0, camera_look_x = -170, camera_look_y = 60;
-color_t randcolor[] = {COLOR_BLACK,COLOR_RED,COLOR_GREEN, COLOR_WHITE, COLOR_CLAN,COLOR_YELLOW,COLOR_ORANGE};
-vector<Rock> rock(250);
+vector<Sphere> fireball;
+double camera_rotation_angle = 100, camera_y = 4, camera_zoom = 0, camera_look_x = -170, camera_look_y = 60;
+color_t randcolor[] = {COLOR_GREEN, COLOR_WHITE, COLOR_CLAN,COLOR_YELLOW};
+vector<Monster> monster(8);
+vector<Monster> bossmonster;
+vector<Rock> rock(50);
+vector<Rock> gifts;
+vector<Rock> biggifts;
+Segmentdisplay score;
+Segmentdisplay health;
+Segmentdisplay game_time;
 int i=0;
+int killcnt=0;
+bool is_audio=0;
 int cnt=0;
 float screen_zoom = 1, screen_center_x = 0, screen_center_y = 0;
 int flag = 0;
+double start_timer;
+double sound_timer;
 glm::vec3 eye,target,up;
+camera_view_t camera_view;
 
-int defView = 3;
-
-Timer t60(1.0 / 60);
+Timer t60(1.0 / 120);
+Timer t1(1.0);
 Timer t2(3.0);
 Timer t3(9.1);
 
@@ -50,77 +61,111 @@ void draw()
     // use the loaded shader program
     // Don't change unless you know what you are doing
     glUseProgram (programID);
-    switch (defView)
-    {
-    case 0:/* cam follow view*/
-        eye = glm::vec3 (boat1.position.x,boat1.position.y+10,boat1.position.z+15);
-        target = glm::vec3(boat1.position.x,boat1.position.y+5,boat1.position.z);
+    if (camera_view == CAMERA_FOLLOW){
+        eye = glm::vec3 (boat.position.x,boat.position.y+10,boat.position.z+15);
+        target = glm::vec3(boat.position.x,boat.position.y+5,boat.position.z);
         up  = glm::vec3 (0, 1, 0);
-        break;
-    case 1:/* driver view*/
-        eye  = glm::vec3(boat1.position.x ,boat1.position.y+3,boat1.position.z-2*cos((boat1.rotation)* PI / 180.0));
-        target  = glm::vec3(boat1.position.x - 4*sin(boat1.rotation* PI / 180.0),boat1.position.y+2,boat1.position.z-6*cos((boat1.rotation)* PI / 180.0));
+    }
+
+    else if (camera_view == CAMERA_DRIVER){
+        eye  = glm::vec3(boat.position.x ,boat.position.y+3,boat.position.z-2*cos((boat.rotation)* PI / 180.0));
+        target  = glm::vec3(boat.position.x - 4*sin(boat.rotation* PI / 180.0),boat.position.y+2,boat.position.z-6*cos((boat.rotation)* PI / 180.0));
         up = glm::vec3 (0, 1, 0);
-        break;
-    case 2:/* top view*/
-        eye  = glm::vec3(boat1.position.x, boat1.position.y+45, boat1.position.z-2);
-        target = glm::vec3 (boat1.position.x,boat1.position.y,boat1.position.z);
+    }
+
+    else if (camera_view == CAMERA_TOP){
+        eye  = glm::vec3(boat.position.x, boat.position.y+45, boat.position.z-2);
+        target = glm::vec3 (boat.position.x,boat.position.y,boat.position.z);
         up = glm::vec3 (0, -1, 0);
-        break;
-    case 3:
-        eye  = glm::vec3( -20, 50, 50 );
-        target = glm::vec3 (0,0,0);//boat1.position.x, boat1.position.y , boat1.position.z);
-        up = glm::vec3 (0, 1, 0);
-    case 4:
+    }
+
+    else if (camera_view == CAMERA_NORMAL){
         eye = glm::vec3( 0, 15,20);
-        target = glm::vec3(0, boat1.position.y, 0);
+        target = glm::vec3(0, boat.position.y, 0);
         up = glm::vec3(0, 1, 0);
     }
 
+    else if (camera_view == CAMERA_TOWER){
+        eye = glm::vec3( 10*cos(camera_rotation_angle*M_PI/180.0f)-2, camera_y, 10*sin(camera_rotation_angle*M_PI/180.0f) + 11 );
+        target = glm::vec3 (0, 3, -2);
+        up = glm::vec3(0, 1, 0);
+    }
+
+    else if (camera_view == CAMERA_HELICOPTER){
+        target = glm::vec3 (10, 0, 10);
+        eye = glm::vec3 ( 10 + (20-camera_zoom/5)*cos(camera_look_x*M_PI/180.0f)*sin(camera_look_y*M_PI/180.0f), (20-camera_zoom/5)*cos(camera_look_y*M_PI/180.0f), 10 + (20-camera_zoom/5)*sin(camera_look_x*M_PI/180.0f)*sin(camera_look_y*M_PI/180.0f) );
+        up  = glm::vec3 (0, 1, 0);
+       }
+    glm::mat4 VP;
     // Compute Camera matrix (view)
     Matrices.view = glm::lookAt( eye, target, up ); // Rotating Camera for 3D
-    // Don't change unless you are sure!!
-    // Matrices.view = glm::lookAt(glm::vec3(0, 0, 3), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0)); // Fixed camera for 2D (ortho) in XY plane
-
-    // Compute ViewProject matrix as view/camera might not be changed for this frame (basic scenario)
-    // Don't change unless you are sure!!
-    glm::mat4 VP = Matrices.projection * Matrices.view;
-
-    // Send our transformation to the currently bound shader, in the "MVP" uniform
-    // For each model you render, since the MVP will be different (at least the M part)
-    // Don't change unless you are sure!!
-    glm::mat4 MVP;  // MVP = Projection * View * Model
+    if (camera_view != CAMERA_HELICOPTER)
+        VP = Matrices.view * glm::scale(glm::vec3(exp(camera_zoom)));
+    else
+        VP = Matrices.view;
+    if (camera_ortho)
+        VP = Matrices.projectionO * VP;
+    else
+        VP = Matrices.projectionP * VP;
 
     // Scene render
     water1.draw(VP);
-    boat1.draw(VP);
+    boat.draw(VP);
+    score.set_position(boat.position.x+3, boat.position.y+12, boat.position.z);
+    score.update(score.view());
+    health.set_position(boat.position.x-9.5, boat.position.y+12, boat.position.z);
+    health.update(health.view());
+    game_time.set_position(boat.position.x-3, boat.position.y+12, boat.position.z);
+    game_time.update(game_time.view());
+    score.draw(VP);
+    health.draw(VP);
+    game_time.draw(VP);
+
+    for(int i=0;i<monster.size();i++)
+        monster[i].draw(VP);
+
+    for(int i=0;i<bossmonster.size();i++)
+        bossmonster[i].draw(VP);
+
+    for (int i=0;i<fireball.size();i++)
+        fireball[i].draw(VP);
 
     for(int i=0;i<rock.size();i++)
-    {
         rock[i].draw(VP);
-    }
-    for (int i=0;i<fireball.size();i++)
-    {
-        fireball[i].draw(VP);
-    }
-    //building1.draw(VP);
-}
 
+    for(int i=0;i<gifts.size();i++)
+        gifts[i].draw(VP);
+
+    for(int i=0;i<biggifts.size();i++)
+        biggifts[i].draw(VP);
+
+}
+void add_fireball(){
+fireball.push_back(Sphere(-1000,1000,-1000,2,COLOR_RED));
+}
 void fire_fireball()
 {
-    fireball[cnt].position = glm::vec3 (boat1.position.x- 6*sin(boat1.rotation* PI / 180.0),boat1.position.y+2,boat1.position.z + 6*cos((boat1.rotation+180)* PI / 180.0));//cannon.position.x, cannon.position.y , cannon.position.z);
-    fprintf(stderr,"fire,%f %f %f\n",fireball[cnt].position.x,fireball[cnt].position.y,fireball[cnt].position.z);
-    fireball[cnt].speed = glm::vec3(-0.5*sin(boat1.rotation*PI/180.0),0.4,-0.5*cos(boat1.rotation*PI/180.0));
-    cnt++;
-}
 
-void change_view()
-{
-    defView = (defView + 1)%5;
+    int i = fireball.size();
+    printf("%d\n",i);
+    if(i==0)
+        add_fireball();
+
+
+    if(i==1)
+    {
+        is_audio = true;
+        sound_timer = glfwGetTime();
+        fireball[i-1].position = glm::vec3 (boat.position.x- 6*sin(boat.rotation* PI / 180.0),boat.position.y+2,boat.position.z + 6*cos((boat.rotation+180)* PI / 180.0));//cannon.position.x, cannon.position.y , cannon.position.z);
+        fprintf(stderr,"fire,%f %f %f\n",fireball[i-1].position.x,fireball[i-1].position.y,fireball[i-1].position.z);
+        fireball[i-1].speed = glm::vec3(boat.speed.x-0.8*sin(boat.rotation*PI/180.0),boat.speed.y + 0.5,boat.speed.z-0.8*cos(boat.rotation*PI/180.0));
+        add_fireball();
+    }
+
 }
 
 void tick_input(GLFWwindow *window) {
-    if (glfwGetKey(window, GLFW_KEY_C)) camera_rotation_angle += 5;
+    if (glfwGetKey(window, GLFW_KEY_S)) camera_rotation_angle += 5;
     if (glfwGetKey(window, GLFW_KEY_Z)) camera_y += 0.05;
     if (glfwGetKey(window, GLFW_KEY_X)) camera_y -= 0.05;
 
@@ -131,26 +176,20 @@ void tick_input(GLFWwindow *window) {
 
     int jump = glfwGetKey(window, GLFW_KEY_SPACE);
 
-    if(jump){
-        boat1.jump();
-    }
+    if(jump)
+        boat.jump();
 
-    if (left) {
-        boat1.left();
-    }
+    if(left)
+        boat.left();
 
     if(right)
-    {
-        boat1.right();
-    }
-    if(up) {
-        //boat1.
-        boat1.forward();;
-    }
-    if(down) {
-        //boat1.cannon.down();
-        boat1.backward();
-    }
+        boat.right();
+
+    if(up)
+        boat.forward();;
+
+    if(down)
+        boat.backward();
 
     int width, height;
     glfwGetWindowSize(window, &width, &height);
@@ -166,22 +205,203 @@ void tick_input(GLFWwindow *window) {
     }
 }
 
+void game_over(){
+    if(health.view() <= 0 || game_time.view() <=0)
+        quit(window);
+}
+
 void tick_elements() {
-    boat1.tick();
-        //boat1.sail.rotation+=6;
-    for (int i=0;i<cnt+1;i++)
+    game_over();
+    boat.tick();
+    water1.tick();
+    double cur = glfwGetTime();
+    if(cur - start_timer > 4)
+        boat.set_speed(0.5f);
+    if(cur - sound_timer > 1)
+        is_audio = false;
+
+    //boat.sail.rotation+=6;
+    for (int i=0;i<fireball.size();i++)
     {
         fireball[i].tick();
+        if(fireball[i].position.y < 0){
+            fireball.erase(fireball.begin()+i);
+        }
     }
-    camera_rotation_angle += 1;
-    static int count = 1;
+
+    for(int i=0;i<monster.size();i++)
+    {
+        monster[i].tick();
+        if(monster[i].position.x<boat.position.x)
+        {
+            monster[i].position.x+=0.1;
+            monster[i].head.position.x += 0.1;
+        }
+        else{
+            monster[i].position.x-=0.1;
+            monster[i].head.position.x -= 0.1;
+        }
+        if(monster[i].position.z<boat.position.z){
+            monster[i].position.z+=0.1;
+            monster[i].head.position.z += 0.1;
+        }
+        else{
+            monster[i].position.z-=0.1;
+            monster[i].head.position.z -= 0.1;
+        }
+        if(detect_collision(fireball[0].bounding_box(), monster[i].bounding_box()))
+        {
+            is_audio = true;
+            sound_timer = glfwGetTime();
+            score.add(10);
+            killcnt ++;
+
+            if(killcnt % 3 == 0){
+                bossmonster.push_back(Monster(
+                                          monster[i].position.x,
+                                          monster[i].position.y,
+                                          monster[i].position.z-1,
+                                          4,1,
+                                          2,
+                                          randcolor[rand()%4],
+                                      randcolor[rand()%4],
+                        randcolor[rand()%4]
+
+                        ));
+                monster.erase(monster.begin() + i);
+
+            }
+            else
+            {
+                gifts.push_back(Rock(monster[i].position.x,monster[i].position.y,monster[i].position.z,2,0,false,monster[i].color));
+                monster.erase(monster.begin() + i);
+            }
+            int k = rand()%2;
+            monster.push_back(Monster(
+                        getRandDouble(-300,300),
+                        3,
+                        getRandDouble(-1000,300),
+                        2.5,
+                        1,
+                        k,
+                        randcolor[rand()%4],
+                    randcolor[rand()%4],
+                    randcolor[rand()%4]
+                    ));
+            fireball.erase(fireball.begin());
+            fprintf(stderr, "Fireball killed the monster, %d\n",killcnt);
+            break;
+        }
+
+        if(detect_collision(boat.bounding_box(), monster[i].bounding_box()))
+        {
+            is_audio = true;
+            sound_timer = glfwGetTime();
+            monster.erase(monster.begin() + i);
+            health.subtract(30);
+            fprintf(stderr, "Boat killed the monster\n");
+            break;
+        }
+    }
+
+    for(int i=0;i<bossmonster.size();i++)
+    {
+        bossmonster[i].tick();
+        if(bossmonster[i].position.x<boat.position.x)
+        {
+            bossmonster[i].position.x+=0.1;
+            bossmonster[i].head.position.x += 0.1;
+        }
+        else{
+            bossmonster[i].position.x-=0.1;
+            bossmonster[i].head.position.x -= 0.1;
+        }
+        if(bossmonster[i].position.z<boat.position.z){
+            bossmonster[i].position.z+=0.1;
+            bossmonster[i].head.position.z += 0.1;
+        }
+        else{
+            bossmonster[i].position.z-=0.1;
+            bossmonster[i].head.position.z -= 0.1;
+        }
+        if(detect_collision(fireball[0].bounding_box(), bossmonster[i].bounding_box()))
+        {
+            is_audio = true;
+            sound_timer = glfwGetTime();
+            bossmonster[i].shootcnt += 1;
+            fprintf(stderr, "%d %d\n",bossmonster[i].reqcnt,bossmonster[i].shootcnt);
+            if(bossmonster[i].reqcnt == bossmonster[i].shootcnt)
+            {
+                score.add(30);
+                biggifts.push_back(Rock(bossmonster[i].position.x,bossmonster[i].position.y+5,bossmonster[i].position.z,1,0,false,bossmonster[i].color));
+                bossmonster.erase(bossmonster.begin() + i);
+                fireball.erase(fireball.begin());
+                fprintf(stderr, "Fireball killed the bossmonster\n");
+            }
+            fireball.erase(fireball.begin());
+            break;
+        }
+        if(detect_collision(boat.bounding_box(), bossmonster[i].bounding_box()))
+        {
+            is_audio = true;
+            sound_timer = glfwGetTime();
+            bossmonster.erase(bossmonster.begin() + i);
+            health.subtract(50);
+            fprintf(stderr, "Boat killed the bossmonster\n");
+            break;
+        }
+    }
+
+    for(int i=0;i<gifts.size();i++)
+    {
+        if(detect_collision(boat.bounding_box(), gifts[i].bounding_box()))
+        {
+            is_audio = true;
+            sound_timer = glfwGetTime();
+            if(gifts[i].color.r == COLOR_GREEN.r){
+                fprintf(stderr,"GREEN\n");
+                health.add(15);
+            }
+            else if(gifts[i].color.r == COLOR_YELLOW.r){
+                fprintf(stderr,"YELLOW\n");
+                health.add(10);
+            }
+            else if(gifts[i].color.r == COLOR_CLAN.r){
+                fprintf(stderr,"CLAN\n");
+                boat.set_speed(1.0f);
+                start_timer = glfwGetTime();
+            }
+            else if(gifts[i].color.r == COLOR_WHITE.r){
+                fprintf(stderr,"WHITE\n");
+                game_time.add(5);
+            }
+            gifts.erase(gifts.begin() + i);
+        }
+    }
+
+    for(int i=0;i< biggifts.size();i++)
+    {
+        if(detect_collision(boat.bounding_box(), biggifts[i].bounding_box()))
+        {
+            is_audio = true;
+            sound_timer = glfwGetTime();
+            /* Add code for bonus*/
+            boat.set_speed(1.3f);
+            start_timer = glfwGetTime();
+            biggifts.erase(biggifts.begin() + i);
+        }
+    }
+
     for(int i=0;i<rock.size();i++)
     {
-        if(detect_collision(boat1.bounding_box(), rock[i].bounding_box()))
+        if(detect_collision(boat.bounding_box(), rock[i].bounding_box()))
         {
+            is_audio = true;
+            fprintf(stderr,"Collison occured with rock");
+            sound_timer = glfwGetTime();
+            health.subtract(10);
             rock.erase(rock.begin() + i);
-            fprintf(stderr, "%d\n", count);
-            count += 1;
+            break;
         }
     }
 }
@@ -193,37 +413,50 @@ void initGL(GLFWwindow *window, int width, int height)
     /* Objects should be created before any other gl function and shaders */
     // Create the models
 
-    water1 = Water(0, 1, 0,COLOR_BLUE);
-    boat1 = Boat(0, 4, 0);
+    water1 = Water(0, 0, 0,COLOR_BLUE);
+    boat = Boat(0, 4, 0);
+    char titlestr[50];
+    sprintf(titlestr, "Score as much as possible");
+    glfwSetWindowTitle(window,titlestr);
+    for(int i=0;i<monster.size();i++)
+    {
+        int k = rand()%2;
+        monster[i] = Monster(
+                    getRandDouble(-300,300),
+                    3,
+                    getRandDouble(-1000,300),
+                    2.5,
+                    1,
+                    k,
+                    randcolor[rand()%4],
+                randcolor[rand()%4],
+                randcolor[rand()%4]
+                );
+    }
     for(int i=0;i<rock.size();i++)
     {
         rock[i] = Rock(
                     getRandDouble(-300,300),
-                    3,
-                    getRandDouble(-300,300),
-                    getRandDouble(2,4),
-                    randcolor[rand()%7]
-                );
+                    8,
+                    getRandDouble(-1000,300),
+                    8,
+                    0.3,
+                    true,
+                    COLOR_GREY
+                    );
     }
-    for(int i=0;i<fireball.size();i++)
-    {
-        fireball[i] = Sphere(-1000,-1000,-1000,0.5);
-    }
-    /*glm::vec3 eye (boat1.position.x, boat1.position.y + 10, boat1.position.z + 15);
-    glm::vec3 target (boat1.position.x, boat1.position.y + 5, boat1.position.z);
-    glm::vec3 up (0, 1, 0);*/
-    // rock[i] = Rock(0,5,);
 
-    //building1 = Building(4,0,COLOR_GREEN);
+    add_fireball();
+    score.update(0);
+    health.update(100);
+    game_time.update(50);
 
     // Create and compile our GLSL program from the shaders
     programID = LoadShaders("Sample_GL.vert", "Sample_GL.frag");
     // Get a handle for our "MVP" uniform
     Matrices.MatrixID = glGetUniformLocation(programID, "MVP");
 
-
     reshapeWindow (window, width, height);
-
     // Background color of the scene
     glClearColor (COLOR_BACKGROUND.r / 256.0, COLOR_BACKGROUND.g / 256.0, COLOR_BACKGROUND.b / 256.0, 0.0f); // R, G, B, A
     glClearDepth (1.0f);
@@ -246,9 +479,13 @@ int main(int argc, char **argv) {
     window = initGLFW(width, height);
 
     initGL (window, width, height);
+    audio_init("assets/song.mp3");
 
-    /* Draw in loop */
+
     while (!glfwWindowShouldClose(window)) {
+        if(is_audio)
+            audio_play();
+
         // Process timers
 
         if (t60.processTick()) {
@@ -260,17 +497,21 @@ int main(int argc, char **argv) {
             glfwSwapBuffers(window);
 
             tick_elements();
+
             tick_input(window);
+        }
+        if(t1.processTick()){
+            game_time.subtract(1);
         }
 
         if (t2.processTick()){
-            boat1.iswind = false;
+            boat.iswind = false;
         }
         if (t3.processTick()){
-            boat1.iswind = true;
-            boat1.windir = getRandDouble(0,180);
+            boat.iswind = true;
+            boat.windir = getRandDouble(0,180);
             printf("Dfdsgdgdf\n");
-           // boat1.blow_wind();
+//            /boat.blow_wind();
         }
 
 
@@ -283,15 +524,12 @@ int main(int argc, char **argv) {
 
 bool detect_collision(bounding_box_t a, bounding_box_t b) {
     return (abs(a.x - b.x) * 2 < (a.width + b.width)) &&
-            (abs(a.y - b.y) * 2 < (a.height + b.height)) &&
-            (abs(a.z - b.z) * 2 < (a.length + b.length));
+                (abs(a.y - b.y) * 2 < (a.height + b.height)) &&
+                    (abs(a.z - b.z) * 2 < (a.length + b.length));
 }
 
 void reset_screen() {
-    float top    = screen_center_y + 4 / screen_zoom;
-    float bottom = screen_center_y - 4 / screen_zoom;
-    float left   = screen_center_x - 4 / screen_zoom;
-    float right  = screen_center_x + 4 / screen_zoom;
-    Matrices.projection = glm::perspective(1.0f, 1.0f, 1.0f, 500.0f);
+    Matrices.projectionO = glm::ortho(-4.0f, 4.0f, -4.0f, 4.0f, 0.1f, 500.0f);
+    Matrices.projectionP = glm::perspective(1.0f, 1.0f, 1.0f, 500.0f);
     //Matrices.projection = glm::ortho(left, right, bottom, top, 0.1f, 500.0f);
 }

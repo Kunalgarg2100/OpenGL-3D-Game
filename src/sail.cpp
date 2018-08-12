@@ -14,7 +14,7 @@ Sail::Sail(float x, float y, float z) {
         0.0f, 0.0f, 0.0f,
 
     };
-    this->flag = create3DObject(GL_TRIANGLES, 3, flag_vertex_buffer_data,COLOR_BROWN);
+    this->flag = create3DObject(GL_TRIANGLES, 3, flag_vertex_buffer_data,COLOR_BLACK);
 }
 
 void Sail::draw(glm::mat4 VP) {

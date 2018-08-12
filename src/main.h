@@ -52,7 +52,8 @@ struct VAO {
 typedef struct VAO VAO;
 
 struct GLMatrices {
-    glm::mat4 projection;
+    glm::mat4 projectionP;
+    glm::mat4 projectionO;
     glm::mat4 model;
     glm::mat4 view;
     GLuint    MatrixID;
@@ -63,6 +64,8 @@ extern GLMatrices Matrices;
 // ---- Logic ----
 
 enum direction_t { DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT };
+enum camera_view_t {CAMERA_FOLLOW, CAMERA_DRIVER, CAMERA_TOP,CAMERA_NORMAL, CAMERA_TOWER,  CAMERA_HELICOPTER};
+extern enum camera_view_t camera_view;
 
 struct bounding_box_t {
     float x;
@@ -81,6 +84,9 @@ extern double camera_rotation_angle, camera_y, camera_zoom,camera_look_x, camera
 extern float screen_zoom, screen_center_x, screen_center_y;
 extern int prev_xpos, prev_ypos;
 void reset_screen();
+void audio_init(const char * s);
+void audio_play();
+void audio_close();
 
 // ---- Colors ----
 // ---- Colors ----
@@ -97,5 +103,6 @@ extern const color_t COLOR_ORANGE;
 extern const color_t COLOR_CLAN;
 extern const color_t COLOR_GREY;
 const double PI = 4 * atan(1);
+extern bool camera_ortho;
 
 #endif

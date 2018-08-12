@@ -7,9 +7,9 @@
 class Sphere {
 public:
     Sphere() {}
-    Sphere(float x, float y, float z, float radius);
-    glm::vec3 position, end1, end2,speed;
-    float rotation;
+    Sphere(float x, float y, float z, float radius,color_t color);
+    glm::vec3 position, end1, end2,speed,end3,end4;
+    float rotation,radius, norm_speed;
     void draw(glm::mat4 VP);
     void set_position(float x, float y, float z);
     void tick();
@@ -17,7 +17,7 @@ public:
     void right();
     void down();
     void up();
-    void decelarate();
+    bounding_box_t bounding_box();
 
 private:
     VAO *object;

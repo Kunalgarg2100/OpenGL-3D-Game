@@ -3,41 +3,30 @@
 
 Water::Water(float x, float y, float z, color_t color) {
     this->position = glm::vec3(x, y, z);
-    this->rotation = 0;
-    //speed = 1;
-    // Our vertices. Three consecutive floats give a 3D vertex; Three consecutive vertices give a triangle.
-    // A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and 12*3 vertices
-
-    int pos=0,i,k,n=100;
-    float j;
-            //Any polygon can be created by changing of n
-            GLfloat g_vertex_buffer_data[180*n];
-            float pi = 3.14159, angle = 0, theta=(2*pi)/n;
-            for(j=0;j<2;j+=0.1){
-                for(i=0;i<n;i++){
-                    g_vertex_buffer_data[pos++]= 0.0f;
-                    g_vertex_buffer_data[pos++]= j;
-                    g_vertex_buffer_data[pos++]= 0.0f;
-                    for(k=0;k<2;k++){
-                        g_vertex_buffer_data[pos++]= 1000*cos(angle);
-                        g_vertex_buffer_data[pos++]= j;
-                        g_vertex_buffer_data[pos++]= 1000*sin(angle);
-                        angle += theta;
-                    }
-                    angle-=theta;
-                }
+    this->acc = 0.02;
+    int ptr=0;
+    GLfloat vertex_buffer_data[72000];
+    for(float k=0;k<1;k+=0.1){
+        for(int i=0;i<800;i++){
+            double angle = i * PI/400;
+            vertex_buffer_data[ptr++]=0.0f;
+            vertex_buffer_data[ptr++]= k;
+            vertex_buffer_data[ptr++]= 0.0f;
+            for(int j=0;j<2;j++)
+            {
+                vertex_buffer_data[ptr++]=1000 * cos(angle);
+                vertex_buffer_data[ptr++]=k;
+                vertex_buffer_data[ptr++]=1000 * sin(angle);
+                angle = (i+1) * PI/400;
             }
-
-    this->object = create3DObject(GL_TRIANGLES, 60*n, g_vertex_buffer_data, color, GL_FILL);
+        }
+    }
+    this->object = create3DObject(GL_TRIANGLES, 24000, vertex_buffer_data, color, GL_FILL);
 }
 
 void Water::draw(glm::mat4 VP) {
     Matrices.model = glm::mat4(1.0f);
-    glm::mat4 translate = glm::translate (this->position);    // glTranslatef
-    glm::mat4 rotate    = glm::rotate((float) (this->rotation * M_PI / 180.0f), glm::vec3(0, 1, 0));
-    // No need as coords centered at 0, 0, 0 of cube arouund which we waant to rotate
-    // rotate          = rotate * glm::translate(glm::vec3(0, -0.6, 0));
-    Matrices.model *= (translate * rotate);
+    Matrices.model *=  glm::translate(position);
     glm::mat4 MVP = VP * Matrices.model;
     glUniformMatrix4fv(Matrices.MatrixID, 1, GL_FALSE, &MVP[0][0]);
     draw3DObject(this->object);
@@ -45,4 +34,12 @@ void Water::draw(glm::mat4 VP) {
 
 void Water::set_position(float x, float y, float z) {
     this->position = glm::vec3(x, y, z);
+}
+
+void Water::tick(){
+    if(this->position.y > 1)
+        this->acc = -0.02;
+    else if (this->position.y < 0)
+        this->acc = 0.02;
+    this->position.y += this->acc;
 }

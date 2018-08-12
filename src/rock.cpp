@@ -1,14 +1,15 @@
 #include "rock.h"
 #include "main.h"
 
-Rock::Rock(float x, float y, float z, float rad, color_t color) {
+Rock::Rock(float x, float y, float z, float rad,float rad1,bool flag,color_t color) {
     this->position = glm::vec3(x, y, z);
     this->rotation = 0;
+    this->color = color;
     speed = 1;
     this->side = rad;
-    // Our vertices. Three consecutive floats give a 3D vertex; Three consecutive vertices give a triangle.
-    // A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and 12*3 vertices
-    static const GLfloat vertex_buffer_data[] = {
+    this->flag = flag;
+
+    GLfloat vertex_buffer_data[] = {
         -rad,-rad,-rad, // triangle 1 : begin
         -rad,-rad, rad,
         -rad, rad, rad, // triangle 1 : end
@@ -46,7 +47,51 @@ Rock::Rock(float x, float y, float z, float rad, color_t color) {
         -rad, rad, rad,
         rad,-rad, rad
     };
-    this->object = create3DObject(GL_TRIANGLES, 12*3, vertex_buffer_data, color, GL_FILL);
+    if(flag){
+    GLfloat toplayer_buffer_data[] = {
+        -rad,rad-rad1,-rad, // triangle 1 : begin
+        -rad,rad-rad1, rad,
+        -rad,rad + rad1, rad, // triangle 1 : end
+        rad,rad + rad1,-rad, // triangle 2 : begin
+        -rad,rad-rad1,-rad,
+        -rad,rad +rad1,-rad, // triangle 2 : end
+        rad,rad -rad1, rad,
+        -rad,rad-rad1,-rad,
+        rad,rad-rad1,-rad,
+        rad,rad+ rad1,-rad,
+        rad,rad-rad1,-rad,
+        -rad,rad-rad1,-rad,
+        -rad,rad-rad1,-rad,
+        -rad,rad+ rad1, rad,
+        -rad,rad+ rad1,-rad,
+        rad,rad-rad1, rad,
+        -rad,rad-rad1, rad,
+        -rad,rad-rad1,-rad,
+        -rad,rad+ rad1, rad,
+        -rad,rad-rad1, rad,
+        rad,rad-rad1, rad,
+        rad,rad+ rad1, rad,
+        rad,rad-rad1,-rad,
+        rad,rad+ rad1,-rad,
+        rad,rad-rad1,-rad,
+        rad,rad+ rad1, rad,
+        rad,rad-rad1, rad,
+        rad,rad + rad1, rad,
+        rad,rad + rad1,-rad,
+        -rad, rad +rad1,-rad,
+        rad, rad + rad1, rad,
+        -rad, rad + rad1,-rad,
+        -rad,rad + rad1, rad,
+        rad, rad + rad1, rad,
+        -rad,rad + rad1, rad,
+        rad,rad -rad1, rad
+    };
+    this->object1 = create3DObject(GL_TRIANGLES, 12*3, toplayer_buffer_data, COLOR_GREEN , GL_FILL);
+    }
+
+
+    this->object = create3DObject(GL_TRIANGLES, 12*3, vertex_buffer_data, color , GL_FILL);
+
 }
 
 void Rock::draw(glm::mat4 VP) {
@@ -59,6 +104,8 @@ void Rock::draw(glm::mat4 VP) {
     glm::mat4 MVP = VP * Matrices.model;
     glUniformMatrix4fv(Matrices.MatrixID, 1, GL_FALSE, &MVP[0][0]);
     draw3DObject(this->object);
+    if(this->flag)
+    draw3DObject(this->object1);
 }
 
 void Rock::set_position(float x, float y) {
